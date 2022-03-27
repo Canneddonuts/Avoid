@@ -1,4 +1,3 @@
-// #include <stdio.h>
 #include "raylib.h"
 
 // screen variables
@@ -13,7 +12,6 @@ typedef struct Ball {
     Vector2 position;
     Vector2 speed;
     float radius;
-    //float growth;
     Color color;
     bool active;
 } Ball;
@@ -84,7 +82,6 @@ void GameInit(void)
 
    ball.position = (Vector2){ 50, 50 };
    ball.radius = 20;
-   //ball.growth = 0.1;
    ball.speed = (Vector2){ 400.0f, 400.0f };
    ball.color = MAROON;
    ball.active = true;
@@ -105,10 +102,11 @@ void UpdateGame(void)
         if (IsKeyPressed(KEY_UP)) selected++;
         if (IsKeyPressed(KEY_DOWN)) selected--;
         if (selected > 0) selected--;
-        if (selected < -1) selected++;
+        if (selected < -2) selected++;
 
         if ((selected == 0) && (IsKeyPressed(KEY_ENTER))) currentScreen = GAMEPLAY;
         if ((selected == -1) && (IsKeyPressed(KEY_ENTER))) currentScreen = CREDITS;
+        if ((selected == -2) && (IsKeyPressed(KEY_ENTER))) OpenURL("https://gitdab.com/Canneddonuts/Avoid.git");
      break;
     case GAMEPLAY:
      UpdateMusicStream(Bgm01);
@@ -144,16 +142,10 @@ void UpdateGame(void)
           ball.position.x += GetFrameTime() * ball.speed.x;
           ball.position.y += GetFrameTime() * ball.speed.y;
 
-          // ball.radius += GetFrameTime() * ball.growth;
-
 
           // Ballz to da wallz collies
           if ((ball.position.x >= (GetScreenWidth() - ball.radius)) || (ball.position.x <= ball.radius)) {ball.speed.x *= -1.0f; if (!mute) PlaySoundMulti(fxbounce);}
           if ((ball.position.y >= (GetScreenHeight() - ball.radius)) || (ball.position.y <= ball.radius)) {ball.speed.y *= -1.0f; if (!mute) PlaySoundMulti(fxbounce);}
-
-      //    if (ball.position.x >= screenWidth) ball.position.x = 100;
-        //  if (ball.position.y >= screenHeight) ball.position.y = 100;
-
 
           if (CheckCollisionCircleRec(ball.position, ball.radius, player.hitbox)) player.hp--;
 
@@ -203,6 +195,9 @@ void DrawGame(void)
 
           if (selected == -1) DrawText("CREDITS", 340, 240, 20, WHITE);
           else DrawText("CREDITS", 340, 240, 20, BLUE);
+
+          if (selected == -2) DrawText("SOURCE CODE", 315, 260, 20, WHITE);
+          else DrawText("SOURCE CODE", 315, 260, 20, BLUE);
           break;
 
         case GAMEPLAY:
