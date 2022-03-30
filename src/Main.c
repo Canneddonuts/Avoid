@@ -1,5 +1,9 @@
 #include "raylib.h"
 
+#if defined(PLATFORM_WEB)
+    #include <emscripten/emscripten.h>
+#endif
+
 // screen variables
 static const int screenWidth  = 800;
 static const int screenHeight = 450;
@@ -22,7 +26,6 @@ typedef struct Player {
 } Player;
 
 // Game variables
-static int Exit_num = 0;
 static GameScreen currentScreen = { 0 };
 static Music Bgm01 = { 0 };
 static Sound fxbounce = { 0 };
@@ -49,19 +52,23 @@ int main(void)
 
   GameInit();
 
+#if defined(PLATFORM_WEB)
+    emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
+#else
+  SetTargetFPS(60);
+
   while (!WindowShouldClose()) UpdateDrawFrame();
+#endif
 
   UnloadGame();
 
   CloseWindow();
 
-  return Exit_num;
+  return 0;
 }
 
 void GameInit(void)
 {
-   SetTargetFPS(60);
-
    currentScreen = TITLE;
 
    Bgm01 = LoadMusicStream("assets/bgm/01-Slipin-Sunday.ogg");
@@ -118,7 +125,7 @@ void UpdateGame(void)
        else ResumeMusicStream(Bgm01);
      }
 
-    if (IsKeyPressed(KEY_SPACE)) pause = !pause;
+    if (IsKeyPressed(KEY_ENTER)) pause = !pause;
 
      if (!pause) {
        // Controls
@@ -144,8 +151,15 @@ void UpdateGame(void)
 
 
           // Ballz to da wallz collies
-          if ((ball.position.x >= (GetScreenWidth() - ball.radius)) || (ball.position.x <= ball.radius)) {ball.speed.x *= -1.0f; if (!mute) PlaySoundMulti(fxbounce);}
-          if ((ball.position.y >= (GetScreenHeight() - ball.radius)) || (ball.position.y <= ball.radius)) {ball.speed.y *= -1.0f; if (!mute) PlaySoundMulti(fxbounce);}
+          if ((ball.position.x >= (GetScreenWidth() - ball.radius)) || (ball.position.x <= ball.radius)) {
+            ball.speed.x *= -1.0f;
+            if (!mute) PlaySoundMulti(fxbounce);
+          }
+
+          if ((ball.position.y >= (GetScreenHeight() - ball.radius)) || (ball.position.y <= ball.radius)) {
+            ball.speed.y *= -1.0f;
+            if (!mute) PlaySoundMulti(fxbounce);
+          }
 
           if (CheckCollisionCircleRec(ball.position, ball.radius, player.hitbox)) player.hp--;
 
@@ -153,6 +167,7 @@ void UpdateGame(void)
           if (BallFrameCounter==2000) ball.radius = 50;
           if (BallFrameCounter==3000) ball.radius = 60;
           if (BallFrameCounter==4000) ball.radius = 70;
+          if (BallFrameCounter==5000) ball.radius = 80;
         }
 
         if (player.hp <= 0) currentScreen = GAMEOVER;
@@ -184,7 +199,7 @@ void DrawGame(void)
           DrawRectangle(0, 0, screenWidth, screenHeight, ORANGE);
           DrawText("Controls", 10, 10, 30, PURPLE);
           DrawText("Press the arrow keys to move", 10, 40, 10, RED);
-          DrawText("Press 'SPACE' to pause", 10, 60, 10, RED);
+          DrawText("Press 'ENTER' to pause", 10, 60, 10, RED);
           DrawText("Press 'M' to mute", 10, 80, 10, RED);
           DrawText("Press 'LSHIFT' + 'F' for full screen", 10, 100, 10, RED);
           DrawText("Press 'R' to restart", 10, 120, 10, RED);
@@ -219,11 +234,11 @@ void DrawGame(void)
 
         case CREDITS:
           DrawRectangle(0, 0, screenWidth, screenHeight, GREEN);
-          DrawText("Avoid", 330, 20, 50, RED);
+          DrawText("Avoid", 330, 20, 50, PINK);
           DrawText("Programming by M-C-O-B", 10, 210, 20, BLUE);
           DrawText("Morale support by Tobi/Tobrella and Jelly_man", 10, 240, 20, BLUE);
           DrawText("Powered by raylib 4.0", 10, 270, 20, BLUE);
-          DrawText("A Canneddonuts project 2022", 10, 310, 40, MAROON);
+          DrawText("A Canneddonuts project 2022", 10, 310, 40, RED);
           DrawText("Press 'ENTER' ", 10, 350, 20, WHITE);
           break;
 
