@@ -72,9 +72,9 @@ void GameInit(void)
 {
    currentScreen = TITLE;
 
-   Bgm01 = LoadMusicStream("assets/bgm/01-Slipin-Sunday.ogg");
+   Bgm01 = LoadMusicStream("rec/01-Slipin-Sunday.ogg");
 
-   fxbounce = LoadSound("assets/sfx/boing.mp3");
+   fxbounce = LoadSound("rec/boing.mp3");
 
 
    PlayMusicStream(Bgm01);
