@@ -1,7 +1,8 @@
-#include "raylib.h"
-
 #if defined(PLATFORM_WEB)
+    #include "/usr/local/include/raylib.h"
     #include <emscripten/emscripten.h>
+#else
+    #include "raylib.h"
 #endif
 
 // screen variables
@@ -16,6 +17,7 @@ typedef struct Ball {
     Vector2 position;
     Vector2 speed;
     float radius;
+    float growth;
     Color color;
     bool active;
 } Ball;
@@ -89,6 +91,7 @@ void GameInit(void)
 
    ball.position = (Vector2){ 50, 50 };
    ball.radius = 20;
+   ball.growth = 2;
    ball.speed = (Vector2){ 400.0f, 400.0f };
    ball.color = MAROON;
    ball.active = true;
@@ -163,11 +166,8 @@ void UpdateGame(void)
 
           if (CheckCollisionCircleRec(ball.position, ball.radius, player.hitbox)) player.hp--;
 
-          if (BallFrameCounter==1000) ball.radius = 40;
-          if (BallFrameCounter==2000) ball.radius = 50;
-          if (BallFrameCounter==3000) ball.radius = 60;
-          if (BallFrameCounter==4000) ball.radius = 70;
-          if (BallFrameCounter==5000) ball.radius = 80;
+
+          if (BallFrameCounter <= 2500)  ball.radius += GetFrameTime() * ball.growth;
         }
 
         if (player.hp <= 0) currentScreen = GAMEOVER;
