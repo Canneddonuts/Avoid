@@ -23,6 +23,10 @@ typedef struct Ball {
 } Ball;
 
 typedef struct Player {
+    Texture2D sprite;
+    int currentframe;
+    Vector2 sprite_pos;
+    Rectangle frameRec;
     Rectangle hitbox;
     int hp;
 } Player;
@@ -81,12 +85,20 @@ void GameInit(void)
    PlayMusicStream(Bgm01);
    SetMasterVolume(0.2);
 
+   player.sprite = LoadTexture("assets/gfx/player.png");
+   player.currentframe = 4;
    player.hp = 30;
+   player.frameRec = (Rectangle) {
+     0.0f,
+     0.0f,
+    (float) player.sprite.width/4,
+    (float) player.sprite.height
+   };
    player.hitbox = (Rectangle) {
      GetScreenWidth()/2.0f - 30,
      GetScreenHeight()/2.0f - 30,
-     50,
-     50
+     70,
+     70
    };
 
    ball.position = (Vector2){ 50, 50 };
@@ -137,6 +149,9 @@ void UpdateGame(void)
        if (IsKeyDown(KEY_UP)) player.hitbox.y -= GetFrameTime() * 300.0f;
        if (IsKeyDown(KEY_DOWN)) player.hitbox.y += GetFrameTime() * 300.0f;
 
+       player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
+       // player.sprite_pos.x = (float)player.currentframe*(float)player.sprite.width/4;
+
        // Player to da wallz collies
        if ((player.hitbox.x + player.hitbox.width) >= GetScreenWidth()) player.hitbox.x = GetScreenWidth() - player.hitbox.width;
        else if (player.hitbox.x <= 0) player.hitbox.x = 0;
@@ -167,7 +182,7 @@ void UpdateGame(void)
           if (CheckCollisionCircleRec(ball.position, ball.radius, player.hitbox)) player.hp--;
 
 
-          if (BallFrameCounter <= 2500)  ball.radius += GetFrameTime() * ball.growth;
+          if (ball.radius <= 100)  ball.radius += GetFrameTime() * ball.growth;
         }
 
         if (player.hp <= 0) currentScreen = GAMEOVER;
@@ -222,7 +237,8 @@ void DrawGame(void)
           DrawText(TextFormat("BALL FRAMES: %i", BallFrameCounter), 10, 30, 20, BLUE);
           DrawText(TextFormat("BALL SIZE: %f", ball.radius), 10, 50, 20, PINK);
           if (ball.active) DrawCircleV(ball.position, (float)ball.radius, ball.color);
-          DrawRectangleRec(player.hitbox, BLUE);
+          // DrawRectangleRec(player.hitbox, BLUE);
+          DrawTextureRec(player.sprite, player.frameRec, player.sprite_pos, WHITE);
           if (pause && ((pauseTimer/30)%2)) DrawText("PAUSED", 330, 190, 30, PURPLE);
           break;
 
@@ -259,4 +275,5 @@ void UnloadGame(void)
 {
   UnloadMusicStream(Bgm01);
   UnloadSound(fxbounce);
+  UnloadTexture(player.sprite);
 }
