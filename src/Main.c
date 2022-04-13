@@ -33,7 +33,6 @@ typedef struct Player {
 
 // Game variables
 static GameScreen currentScreen = { 0 };
-static Music Bgm01 = { 0 };
 static Sound fxbounce = { 0 };
 static Player player = { 0 };
 static Ball ball = { 0 };
@@ -77,21 +76,17 @@ void GameInit(void)
 {
    currentScreen = TITLE;
 
-   Bgm01 = LoadMusicStream("assets/bgm/01-Slipin-Sunday.ogg");
-
    fxbounce = LoadSound("assets/sfx/boing.wav");
 
-
-   PlayMusicStream(Bgm01);
    SetMasterVolume(0.2);
 
    player.sprite = LoadTexture("assets/gfx/player.png");
-   player.currentframe = 4;
+   player.currentframe = 0;
    player.hp = 30;
    player.frameRec = (Rectangle) {
      0.0f,
      0.0f,
-    (float) player.sprite.width/4,
+    (float) player.sprite.width/2,
     (float) player.sprite.height
    };
    player.hitbox = (Rectangle) {
@@ -117,7 +112,7 @@ void GameInit(void)
 
 void UpdateGame(void)
 {
- if ((IsKeyDown(KEY_LEFT_SHIFT)) && (IsKeyPressed(KEY_F))) ToggleFullscreen();
+ if ((IsKeyDown(KEY_LEFT_ALT)) && (IsKeyPressed(KEY_F))) ToggleFullscreen();
 
   switch(currentScreen) {
     case TITLE:
@@ -131,14 +126,8 @@ void UpdateGame(void)
         if ((selected == -2) && (IsKeyPressed(KEY_ENTER))) OpenURL("https://gitdab.com/Canneddonuts/Avoid.git");
      break;
     case GAMEPLAY:
-     UpdateMusicStream(Bgm01);
 
-     if (IsKeyPressed(KEY_M)) {
-       mute = !mute;
-
-       if (mute) PauseMusicStream(Bgm01);
-       else ResumeMusicStream(Bgm01);
-     }
+     if (IsKeyPressed(KEY_M)) mute = !mute;
 
     if (IsKeyPressed(KEY_ENTER)) pause = !pause;
 
@@ -150,7 +139,7 @@ void UpdateGame(void)
        if (IsKeyDown(KEY_DOWN)) player.hitbox.y += GetFrameTime() * 300.0f;
 
        player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
-       // player.sprite_pos.x = (float)player.currentframe*(float)player.sprite.width/4;
+       player.frameRec.x = (float)player.currentframe*(float)player.sprite.width/2;
 
        // Player to da wallz collies
        if ((player.hitbox.x + player.hitbox.width) >= GetScreenWidth()) player.hitbox.x = GetScreenWidth() - player.hitbox.width;
@@ -179,7 +168,10 @@ void UpdateGame(void)
             if (!mute) PlaySoundMulti(fxbounce);
           }
 
-          if (CheckCollisionCircleRec(ball.position, ball.radius, player.hitbox)) player.hp--;
+          if (CheckCollisionCircleRec(ball.position, ball.radius, player.hitbox)) {
+            player.hp--;
+            player.currentframe = 1;
+          } else player.currentframe = 0;
 
 
           if (ball.radius <= 100)  ball.radius += GetFrameTime() * ball.growth;
@@ -216,7 +208,7 @@ void DrawGame(void)
           DrawText("Press the arrow keys to move", 10, 40, 10, RED);
           DrawText("Press 'ENTER' to pause", 10, 60, 10, RED);
           DrawText("Press 'M' to mute", 10, 80, 10, RED);
-          DrawText("Press 'LSHIFT' + 'F' for full screen", 10, 100, 10, RED);
+          DrawText("Press 'Left-ALT' + 'F' for full screen", 10, 100, 10, RED);
           DrawText("Press 'R' to restart", 10, 120, 10, RED);
           DrawText("Press 'ENTER' to select an option", 10, 140, 10, RED);
           DrawText("Avoid", 330, 20, 50, BLUE);
@@ -273,7 +265,6 @@ void UpdateDrawFrame(void)
 
 void UnloadGame(void)
 {
-  UnloadMusicStream(Bgm01);
   UnloadSound(fxbounce);
   UnloadTexture(player.sprite);
 }
