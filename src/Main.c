@@ -1,9 +1,10 @@
+#include "../include/raylib.h"
+
 #if defined(PLATFORM_WEB)
-    #include "/usr/local/include/raylib.h"
     #include <emscripten/emscripten.h>
-#else
-    #include "raylib.h"
 #endif
+
+
 
 // screen variables
 static const int screenWidth  = 800;
