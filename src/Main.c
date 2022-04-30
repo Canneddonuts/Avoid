@@ -4,8 +4,6 @@
     #include <emscripten/emscripten.h>
 #endif
 
-
-
 // screen variables
 static const int screenWidth  = 800;
 static const int screenHeight = 450;
@@ -44,11 +42,12 @@ static int BallFrameCounter;
 static int selected = 0;
 
 // Game functions
-static void GameInit(void);
-static void UpdateGame(void);
-static void DrawGame(void);
-static void UpdateDrawFrame(void);
-static void UnloadGame(void);
+static void gameSetup(void);
+static void updateGame(void);
+static void drawGame(void);
+static void gameReset(void);
+static void gameLoop(void);
+static void unloadGame(void);
 
 int main(void)
 {
@@ -56,25 +55,26 @@ int main(void)
 
   InitAudioDevice();
 
-  GameInit();
+  gameSetup();
 
 #if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
+    emscripten_set_main_loop(gameLoop, 0, 1);
 #else
   SetTargetFPS(60);
 
-  while (!WindowShouldClose()) UpdateDrawFrame();
+  while (!WindowShouldClose()) gameLoop();
 #endif
 
-  UnloadGame();
+  unloadGame();
 
   CloseWindow();
 
   return 0;
 }
 
-void GameInit(void)
+void gameSetup(void)
 {
+  // asset loading & setting of variable values
    currentScreen = TITLE;
 
    fxbounce = LoadSound("assets/sfx/boing.wav");
@@ -111,8 +111,9 @@ void GameInit(void)
    BallFrameCounter = 0;
 }
 
-void UpdateGame(void)
+void updateGame(void)
 {
+  // code that runs as long as the program is running
  if ((IsKeyDown(KEY_LEFT_ALT)) && (IsKeyPressed(KEY_F))) ToggleFullscreen();
 
   switch(currentScreen) {
@@ -150,7 +151,7 @@ void UpdateGame(void)
        else if (player.hitbox.y <= 0) player.hitbox.y = 0;
 
        if (IsKeyPressed(KEY_D)) ball.active = !ball.active;
-       if (IsKeyPressed(KEY_R)) { GameInit(); currentScreen = TITLE; }
+       if (IsKeyPressed(KEY_R)) { gameReset(); currentScreen = TITLE; }
         if (ball.active) {
           BallFrameCounter++;
           // moveiement oof the balls
@@ -186,7 +187,7 @@ void UpdateGame(void)
       break;
     case GAMEOVER:
         if (IsKeyPressed(KEY_ENTER)) {
-          GameInit();
+          gameReset();
           currentScreen = GAMEPLAY;
         }
         break;
@@ -196,8 +197,9 @@ void UpdateGame(void)
   }
 }
 
-void DrawGame(void)
+void drawGame(void)
 {
+  // code to render the game to the game window
   BeginDrawing();
 
       ClearBackground(RAYWHITE);
@@ -257,14 +259,44 @@ void DrawGame(void)
   EndDrawing();
 }
 
-
-void UpdateDrawFrame(void)
+void gameReset(void)
 {
-  UpdateGame();
-  DrawGame();
+  // code to reset all variables without reloading assets
+   currentScreen = TITLE;
+
+   player.currentframe = 0;
+   player.hp = 30;
+   player.frameRec = (Rectangle) {
+     0.0f,
+     0.0f,
+    (float) player.sprite.width/2,
+    (float) player.sprite.height
+   };
+   player.hitbox = (Rectangle) {
+     GetScreenWidth()/2.0f - 30,
+     GetScreenHeight()/2.0f - 30,
+     70,
+     70
+   };
+
+   ball.position = (Vector2){ 50, 50 };
+   ball.radius = 20;
+   ball.growth = 2;
+   ball.speed = (Vector2){ 400.0f, 400.0f };
+   ball.color = MAROON;
+   ball.active = true;
+
+   pauseTimer = 0;
+   BallFrameCounter = 0;
 }
 
-void UnloadGame(void)
+void gameLoop(void)
+{
+  updateGame();
+  drawGame();
+}
+
+void unloadGame(void)
 {
   UnloadSound(fxbounce);
   UnloadTexture(player.sprite);
