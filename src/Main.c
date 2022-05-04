@@ -38,7 +38,7 @@ static Ball ball = { 0 };
 static bool pause;
 static bool mute;
 static int pauseTimer;
-static int BallFrameCounter;
+static int score, bestscore;
 static int selected = 0;
 
 // Game functions
@@ -108,7 +108,7 @@ void gameSetup(void)
    mute = 0;
 
    pauseTimer = 0;
-   BallFrameCounter = 0;
+   score = 0;
 }
 
 void updateGame(void)
@@ -151,14 +151,17 @@ void updateGame(void)
        else if (player.hitbox.y <= 0) player.hitbox.y = 0;
 
        if (IsKeyPressed(KEY_D)) ball.active = !ball.active;
-       if (IsKeyPressed(KEY_R)) { gameReset(); currentScreen = TITLE; }
+       if (IsKeyPressed(KEY_R)) {
+         gameReset();
+         currentScreen = TITLE;
+       }
         if (ball.active) {
-          BallFrameCounter++;
+          score++;
           // moveiement oof the balls
           ball.position.x += GetFrameTime() * ball.speed.x;
           ball.position.y += GetFrameTime() * ball.speed.y;
 
-
+          if (score >= bestscore)  bestscore = score;
           // Ballz to da wallz collies
           if ((ball.position.x >= (GetScreenWidth() - ball.radius)) || (ball.position.x <= ball.radius)) {
             ball.speed.x *= -1.0f;
@@ -178,14 +181,17 @@ void updateGame(void)
 
           if (ball.radius <= 100)  ball.radius += GetFrameTime() * ball.growth;
         }
-
-        if (player.hp <= 0) currentScreen = GAMEOVER;
+        if (player.hp <= 0) {
+          gameReset();
+          currentScreen = GAMEOVER;
+        }
 
      }
      else pauseTimer++;
 
       break;
     case GAMEOVER:
+      if (score > bestscore) bestscore = score;
         if (IsKeyPressed(KEY_ENTER)) {
           gameReset();
           currentScreen = GAMEPLAY;
@@ -208,6 +214,7 @@ void drawGame(void)
         case TITLE:
           DrawRectangle(0, 0, screenWidth, screenHeight, ORANGE);
           DrawText("Controls", 10, 10, 30, PURPLE);
+          DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, WHITE);
           DrawText("Press the arrow keys to move", 10, 40, 10, RED);
           DrawText("Press 'ENTER' to pause", 10, 60, 10, RED);
           DrawText("Press 'M' to mute", 10, 80, 10, RED);
@@ -229,7 +236,7 @@ void drawGame(void)
           DrawRectangle(0, 0, screenWidth, screenHeight, BLACK);
           DrawFPS(10, 430);
           DrawText(TextFormat("HP: %i", player.hp), 10, 10, 20, RED);
-          DrawText(TextFormat("BALL FRAMES: %i", BallFrameCounter), 10, 30, 20, BLUE);
+          DrawText(TextFormat("SCORE: %i", score), 10, 30, 20, BLUE);
           DrawText(TextFormat("BALL SIZE: %f", ball.radius), 10, 50, 20, PINK);
           if (ball.active) DrawCircleV(ball.position, (float)ball.radius, ball.color);
           // DrawRectangleRec(player.hitbox, BLUE);
@@ -246,7 +253,7 @@ void drawGame(void)
         case CREDITS:
           DrawRectangle(0, 0, screenWidth, screenHeight, GREEN);
           DrawText("Avoid", 330, 20, 50, PINK);
-          DrawText("Programming by M-C-O-B", 10, 210, 20, BLUE);
+          DrawText("Programming by Return0ne", 10, 210, 20, BLUE);
           DrawText("Morale support by Tobi/Tobrella and Jelly_man", 10, 240, 20, BLUE);
           DrawText("Powered by raylib 4.0", 10, 270, 20, BLUE);
           DrawText("A Canneddonuts project 2022", 10, 310, 40, RED);
@@ -287,7 +294,7 @@ void gameReset(void)
    ball.active = true;
 
    pauseTimer = 0;
-   BallFrameCounter = 0;
+   score = 0;
 }
 
 void gameLoop(void)
