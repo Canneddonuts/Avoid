@@ -127,7 +127,7 @@ void updateGame(void)
 
         if ((selected == 0) && (IsKeyPressed(KEY_ENTER))) currentScreen = GAMEPLAY;
         if ((selected == -1) && (IsKeyPressed(KEY_ENTER))) currentScreen = CREDITS;
-        if ((selected == -2) && (IsKeyPressed(KEY_ENTER))) OpenURL("https://gitdab.com/Canneddonuts/Avoid.git");
+        if ((selected == -2) && (IsKeyPressed(KEY_ENTER))) OpenURL("https://canneddonuts.itch.io/");
      break;
     case GAMEPLAY:
 
@@ -234,8 +234,8 @@ void drawGame(void)
           if (selected == -1) DrawText("CREDITS", 340, 240, 20, WHITE);
           else DrawText("CREDITS", 340, 240, 20, BLUE);
 
-          if (selected == -2) DrawText("SOURCE CODE", 315, 260, 20, WHITE);
-          else DrawText("SOURCE CODE", 315, 260, 20, BLUE);
+          if (selected == -2) DrawText("MORE GAMES", 320, 260, 20, WHITE);
+          else DrawText("MORE GAMES", 320, 260, 20, BLUE);
           break;
 
         case GAMEPLAY:
@@ -258,7 +258,7 @@ void drawGame(void)
 
         case CREDITS:
           DrawRectangle(0, 0, screenWidth, screenHeight, GREEN);
-          DrawText("Avoid", 330, 20, 50, PINK);
+          DrawText("Avoid", 330, 20, 50, MAGENTA);
           DrawText("Programming by Return0ne", 10, 210, 20, BLUE);
           DrawText("Morale support by Tobi/Tobrella and Jelly_man", 10, 240, 20, BLUE);
           DrawText("Powered by raylib 4.0", 10, 270, 20, BLUE);
