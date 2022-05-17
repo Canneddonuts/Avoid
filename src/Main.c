@@ -31,6 +31,9 @@ typedef struct Player {
 } Player;
 
 // Game variables
+static int pauseTimer;
+static int score, bestscore;
+static int titleSelected = 0, gameoverSelected = 0;
 static GameScreen currentScreen = { 0 };
 static Sound fxbounce = { 0 };
 static Player player = { 0 };
@@ -38,9 +41,6 @@ static Ball ball = { 0 };
 static bool pause;
 static bool mute;
 static bool ShowHitbox;
-static int pauseTimer;
-static int score, bestscore;
-static int selected = 0;
 
 // Game functions
 static void gameSetup(void);
@@ -58,12 +58,13 @@ int main(void)
 
   gameSetup();
 
+
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(gameLoop, 0, 1);
 #else
-  SetTargetFPS(60);
+    SetTargetFPS(60);
 
-  while (!WindowShouldClose()) gameLoop();
+    while (!WindowShouldClose()) gameLoop();
 #endif
 
   unloadGame();
@@ -99,7 +100,7 @@ void gameSetup(void)
    };
 
    ball.position = (Vector2){ 50, 50 };
-   ball.speed = (Vector2){ 400.0f,  300.0f };
+   ball.speed = (Vector2){ 6.0f,  5.0f };
    ball.radius = 20;
    ball.growth = 2;
    ball.color = MAROON;
@@ -108,7 +109,6 @@ void gameSetup(void)
    pause = 0;
    mute = 0;
    ShowHitbox = 0;
-
    pauseTimer = 0;
    score = 0;
 }
@@ -120,14 +120,14 @@ void updateGame(void)
 
   switch(currentScreen) {
     case TITLE:
-        if (IsKeyPressed(KEY_UP)) selected++;
-        if (IsKeyPressed(KEY_DOWN)) selected--;
-        if (selected > 0) selected--;
-        if (selected < -2) selected++;
+        if (IsKeyPressed(KEY_UP)) titleSelected++;
+        if (IsKeyPressed(KEY_DOWN)) titleSelected--;
+        if (titleSelected > 0) titleSelected--;
+        if (titleSelected < -2) titleSelected++;
 
-        if ((selected == 0) && (IsKeyPressed(KEY_ENTER))) currentScreen = GAMEPLAY;
-        if ((selected == -1) && (IsKeyPressed(KEY_ENTER))) currentScreen = CREDITS;
-        if ((selected == -2) && (IsKeyPressed(KEY_ENTER))) OpenURL("https://canneddonuts.itch.io/");
+        if ((titleSelected == 0) && (IsKeyPressed(KEY_ENTER))) currentScreen = GAMEPLAY;
+        if ((titleSelected == -1) && (IsKeyPressed(KEY_ENTER))) currentScreen = CREDITS;
+        if ((titleSelected == -2) && (IsKeyPressed(KEY_ENTER))) OpenURL("https://canneddonuts.itch.io/");
      break;
     case GAMEPLAY:
 
@@ -169,8 +169,8 @@ void updateGame(void)
         if (ball.active) {
           score++;
           // moveiement oof the balls
-          ball.position.x += GetFrameTime() * ball.speed.x;
-          ball.position.y += GetFrameTime() * ball.speed.y;
+          ball.position.x +=  ball.speed.x;
+          ball.position.y +=  ball.speed.y;
 
           if (score >= bestscore)  bestscore = score;
           // Ballz to da wallz collies
@@ -197,11 +197,17 @@ void updateGame(void)
 
       break;
     case GAMEOVER:
-      if (score > bestscore) bestscore = score;
-        if (IsKeyPressed(KEY_ENTER)) {
+        if (IsKeyPressed(KEY_UP)) gameoverSelected++;
+        if (IsKeyPressed(KEY_DOWN)) gameoverSelected--;
+        if (gameoverSelected > 0) gameoverSelected--;
+        if (gameoverSelected < -1) gameoverSelected++;
+
+        if ((gameoverSelected == 0) && (IsKeyPressed(KEY_ENTER))) {
           gameReset();
           currentScreen = GAMEPLAY;
         }
+
+        if ((gameoverSelected == -1) && (IsKeyPressed(KEY_ENTER))) gameReset();
         break;
     case CREDITS:
         if (IsKeyPressed(KEY_ENTER)) currentScreen = TITLE;
@@ -228,13 +234,13 @@ void drawGame(void)
           DrawText("Press 'R' to restart", 10, 120, 10, RED);
           DrawText("Press 'ENTER' to select an option", 10, 140, 10, RED);
           DrawText("Avoid", 330, 20, 50, BLUE);
-          if (selected == 0) DrawText("PLAY", 360, 220, 20, WHITE);
+          if (titleSelected == 0) DrawText("PLAY", 360, 220, 20, WHITE);
           else DrawText("PLAY", 360, 220, 20, BLUE);
 
-          if (selected == -1) DrawText("CREDITS", 340, 240, 20, WHITE);
+          if (titleSelected == -1) DrawText("CREDITS", 340, 240, 20, WHITE);
           else DrawText("CREDITS", 340, 240, 20, BLUE);
 
-          if (selected == -2) DrawText("MORE GAMES", 320, 260, 20, WHITE);
+          if (titleSelected == -2) DrawText("MORE GAMES", 320, 260, 20, WHITE);
           else DrawText("MORE GAMES", 320, 260, 20, BLUE);
           break;
 
@@ -253,7 +259,11 @@ void drawGame(void)
         case GAMEOVER:
           DrawRectangle(0, 0, screenWidth, screenHeight, BLUE);
           DrawText("GAMEOVER", 250, 20, 50, RED);
-          DrawText("PRESS ENTER TO RESET", 270, 220, 20, WHITE);
+          if (gameoverSelected == 0) DrawText("RETRY", 350, 200, 20, WHITE);
+          else DrawText("RETRY", 350, 200, 20, RED);
+
+          if (gameoverSelected == -1) DrawText("TITLE", 350, 230, 20, WHITE);
+          else DrawText("TITLE", 350, 230, 20, RED);
           break;
 
         case CREDITS:
@@ -294,6 +304,8 @@ void gameReset(void)
 
    pauseTimer = 0;
    score = 0;
+
+   gameoverSelected = 0;
 }
 
 void gameLoop(void)
