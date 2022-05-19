@@ -58,9 +58,8 @@ int main(void)
 
   gameSetup();
 
-
 #if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(gameLoop, 0, 1);
+    emscripten_set_main_loop(gameLoop, 60, 1);
 #else
     SetTargetFPS(60);
 
@@ -100,7 +99,7 @@ void gameSetup(void)
    };
 
    ball.position = (Vector2){ 50, 50 };
-   ball.speed = (Vector2){ 6.0f,  5.0f };
+   ball.speed = (Vector2){ 400.0f,  300.0f };
    ball.radius = 20;
    ball.growth = 2;
    ball.color = MAROON;
@@ -169,8 +168,8 @@ void updateGame(void)
         if (ball.active) {
           score++;
           // moveiement oof the balls
-          ball.position.x +=  ball.speed.x;
-          ball.position.y +=  ball.speed.y;
+          ball.position.x += GetFrameTime() * ball.speed.x;
+          ball.position.y += GetFrameTime() * ball.speed.y;
 
           if (score >= bestscore)  bestscore = score;
           // Ballz to da wallz collies
