@@ -1,3 +1,10 @@
+/*
+-    Avoid a game by Canneddonuts
+-        Filename ~ Main.c
+-       Author ~ Return0ne
+-            2022
+-         *no license*
+*/
 #include "../include/raylib.h"
 
 #if defined(PLATFORM_WEB)
@@ -167,7 +174,7 @@ void updateGame(void)
 
         if (ball.active) {
           score++;
-          // moveiement oof the balls
+          // moveiement of the balls
           ball.position.x += GetFrameTime() * ball.speed.x;
           ball.position.y += GetFrameTime() * ball.speed.y;
 
@@ -201,12 +208,11 @@ void updateGame(void)
         if (gameoverSelected > 0) gameoverSelected--;
         if (gameoverSelected < -1) gameoverSelected++;
 
-        if ((gameoverSelected == 0) && (IsKeyPressed(KEY_ENTER))) {
-          gameReset();
+        if ((gameoverSelected == 0) && (IsKeyPressed(KEY_ENTER)))
           currentScreen = GAMEPLAY;
-        }
 
-        if ((gameoverSelected == -1) && (IsKeyPressed(KEY_ENTER))) gameReset();
+        if ((gameoverSelected == -1) && (IsKeyPressed(KEY_ENTER)))
+          currentScreen = TITLE;
         break;
     case CREDITS:
         if (IsKeyPressed(KEY_ENTER)) currentScreen = TITLE;
@@ -261,17 +267,16 @@ void drawGame(void)
           if (gameoverSelected == 0) DrawText("RETRY", 350, 200, 20, WHITE);
           else DrawText("RETRY", 350, 200, 20, RED);
 
-          if (gameoverSelected == -1) DrawText("TITLE", 350, 230, 20, WHITE);
-          else DrawText("TITLE", 350, 230, 20, RED);
+          if (gameoverSelected == -1) DrawText("TITLE", 352, 230, 20, WHITE);
+          else DrawText("TITLE", 352, 230, 20, RED);
           break;
 
         case CREDITS:
           DrawRectangle(0, 0, screenWidth, screenHeight, GREEN);
           DrawText("Avoid", 330, 20, 50, MAGENTA);
-          DrawText("Programming by Return0ne", 10, 210, 20, BLUE);
-          DrawText("Morale support by Tobi/Tobrella and Jelly_man", 10, 240, 20, BLUE);
-          DrawText("Powered by raylib 4.0", 10, 270, 20, BLUE);
-          DrawText("A Canneddonuts project 2022", 10, 310, 40, RED);
+          DrawText("Programming and Art by Return0ne", 10, 210, 20, BLUE);
+          DrawText("Powered by raylib 4.0", 10, 240, 20, BLUE);
+          DrawText("A Canneddonuts project 2022", 10, 270, 40, RED);
           DrawText("Press 'ENTER' ", 10, 350, 20, WHITE);
           break;
 
@@ -284,8 +289,6 @@ void drawGame(void)
 void gameReset(void)
 {
   // code to reset all variables without reloading assets
-   currentScreen = TITLE;
-
    player.currentframe = 0;
    player.hp = 30;
    player.hitbox = (Rectangle) {
