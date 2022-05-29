@@ -1,10 +1,11 @@
 /*
--    Avoid a game by Canneddonuts
+-    Avoid ~ a game by Canneddonuts
 -        Filename ~ Main.c
 -       Author ~ Return0ne
 -            2022
 -         *no license*
 */
+
 #include "../include/raylib.h"
 
 #if defined(PLATFORM_WEB)
@@ -30,11 +31,12 @@ typedef struct Ball {
 
 typedef struct Player {
     Texture2D sprite;
+    float speed;
+    int hp;
     int currentframe;
     Vector2 sprite_pos;
     Rectangle frameRec;
     Rectangle hitbox;
-    int hp;
 } Player;
 
 // Game variables
@@ -91,11 +93,12 @@ void gameSetup(void)
 
    player.sprite = LoadTexture("assets/gfx/player.png");
    player.currentframe = 0;
+   player.speed = 300.0f;
    player.hp = 30;
    player.frameRec = (Rectangle) {
      0.0f,
      0.0f,
-    (float) player.sprite.width/2,
+    (float) player.sprite.width/3,
     (float) player.sprite.height
    };
    player.hitbox = (Rectangle) {
@@ -143,13 +146,19 @@ void updateGame(void)
 
      if (!pause) {
        // Controls
-       if (IsKeyDown(KEY_LEFT)) player.hitbox.x -= GetFrameTime() * 300.0f;
-       if (IsKeyDown(KEY_RIGHT)) player.hitbox.x += GetFrameTime() * 300.0f;
-       if (IsKeyDown(KEY_UP)) player.hitbox.y -= GetFrameTime() * 300.0f;
-       if (IsKeyDown(KEY_DOWN)) player.hitbox.y += GetFrameTime() * 300.0f;
+       if (IsKeyDown(KEY_LEFT)) player.hitbox.x -= GetFrameTime() * player.speed;
+       if (IsKeyDown(KEY_RIGHT)) player.hitbox.x += GetFrameTime() * player.speed;
+       if (IsKeyDown(KEY_UP)) player.hitbox.y -= GetFrameTime() * player.speed;
+       if (IsKeyDown(KEY_DOWN)) player.hitbox.y += GetFrameTime() * player.speed;
+       if (IsKeyDown(KEY_X)) {
+         // player.speed *= 2;
+         player.speed = 600.0f;
+         if (player.currentframe != 1) player.currentframe = 2;
+       } else player.speed = 300.0f;
+
 
        player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
-       player.frameRec.x = (float)player.currentframe*(float)player.sprite.width/2;
+       player.frameRec.x = (float)player.currentframe*(float)player.sprite.width/3;
 
        // Player to da wallz collies
        if ((player.hitbox.x + player.hitbox.width) >= GetScreenWidth()) player.hitbox.x = GetScreenWidth() - player.hitbox.width;
@@ -174,7 +183,7 @@ void updateGame(void)
 
         if (ball.active) {
           score++;
-          // moveiement of the balls
+          // movement of the ball
           ball.position.x += GetFrameTime() * ball.speed.x;
           ball.position.y += GetFrameTime() * ball.speed.y;
 
@@ -232,7 +241,7 @@ void drawGame(void)
           DrawRectangle(0, 0, screenWidth, screenHeight, ORANGE);
           DrawText("Controls", 10, 10, 30, PURPLE);
           DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, WHITE);
-          DrawText("Press the arrow keys to move", 10, 40, 10, RED);
+          DrawText("Press the arrow keys to move and 'X' to dash", 10, 40, 10, RED);
           DrawText("Press 'ENTER' to pause", 10, 60, 10, RED);
           DrawText("Press 'M' to mute", 10, 80, 10, RED);
           DrawText("Press 'Left-ALT' + 'F' for full screen", 10, 100, 10, RED);
@@ -290,6 +299,7 @@ void gameReset(void)
 {
   // code to reset all variables without reloading assets
    player.currentframe = 0;
+   player.speed = 300.0f;
    player.hp = 30;
    player.hitbox = (Rectangle) {
      GetScreenWidth()/2.0f - 30,
