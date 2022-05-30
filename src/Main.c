@@ -49,7 +49,7 @@ static Player player = { 0 };
 static Ball ball = { 0 };
 static bool pause;
 static bool mute;
-static bool ShowHitbox;
+static bool DebugMode;
 
 // Game functions
 static void gameSetup(void);
@@ -117,7 +117,7 @@ void gameSetup(void)
 
    pause = 0;
    mute = 0;
-   ShowHitbox = 0;
+   DebugMode = 0;
    pauseTimer = 0;
    score = 0;
 }
@@ -167,9 +167,9 @@ void updateGame(void)
        if ((player.hitbox.y + player.hitbox.height) >= GetScreenHeight()) player.hitbox.y = GetScreenHeight() - player.hitbox.height;
        else if (player.hitbox.y <= 0) player.hitbox.y = 0;
 
-       if (IsKeyPressed(KEY_D)) ball.active = !ball.active;
+       if (IsKeyPressed(KEY_B)) ball.active = !ball.active;
 
-       if (IsKeyPressed(KEY_H)) ShowHitbox = !ShowHitbox;
+       if (IsKeyPressed(KEY_D)) DebugMode = !DebugMode;
 
        if (IsKeyPressed(KEY_R)) {
          gameReset();
@@ -263,9 +263,13 @@ void drawGame(void)
           DrawFPS(10, 430);
           DrawText(TextFormat("HP: %i", player.hp), 10, 10, 20, RED);
           DrawText(TextFormat("SCORE: %i", score), 10, 30, 20, BLUE);
-          DrawText(TextFormat("BALL SIZE: %f", ball.radius), 10, 50, 20, PINK);
+          if (DebugMode) {
+            DrawText(TextFormat("BALL SIZE: %f", ball.radius), 10, 50, 20, GREEN);
+            DrawText(TextFormat("BALL POS X: %f, BALL POS Y: %f", ball.position.x, ball.position.y), 10, 70, 20, GREEN);
+            DrawText(TextFormat("BALL SPEED X: %f, BALL SPEED Y: %f", ball.speed.x, ball.speed.y), 10, 90, 20, GREEN);
+            DrawRectangleRec(player.hitbox, BLUE);
+          }
           if (ball.active) DrawCircleV(ball.position, (float)ball.radius, ball.color);
-          if (ShowHitbox) DrawRectangleRec(player.hitbox, BLUE);
           DrawTextureRec(player.sprite, player.frameRec, player.sprite_pos, WHITE);
           if (pause && ((pauseTimer/30)%2)) DrawText("PAUSED", 330, 190, 30, PURPLE);
           break;
@@ -312,7 +316,7 @@ void gameReset(void)
    ball.radius = 20;
    ball.active = true;
 
-   ShowHitbox = 0;
+   DebugMode = 0;
 
    pauseTimer = 0;
    score = 0;
