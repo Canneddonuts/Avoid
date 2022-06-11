@@ -8,6 +8,8 @@
 
 #include "../include/raylib.h"
 
+#include "Controls.h"
+
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
 #endif
@@ -38,7 +40,14 @@ typedef struct Player {
     Rectangle frameRec;
     Rectangle hitbox;
 } Player;
-
+/*
+typedef struct Item {
+    Texture2D sprite;
+    Vector2 sprite_pos;
+    Rectangle hitbox;
+    bool active;
+} Item;
+*/
 // Game variables
 static int pauseTimer;
 static int score, bestscore;
@@ -47,6 +56,7 @@ static GameScreen currentScreen = { 0 };
 static Sound fxbounce = { 0 };
 static Player player = { 0 };
 static Ball ball = { 0 };
+// static Item heart = { 0 };
 static bool pause;
 static bool mute;
 static bool DebugMode;
@@ -77,6 +87,8 @@ int main(void)
 
   unloadGame();
 
+  CloseAudioDevice();
+
   CloseWindow();
 
   return 0;
@@ -96,18 +108,27 @@ void gameSetup(void)
    player.speed = 300.0f;
    player.hp = 30;
    player.frameRec = (Rectangle) {
-     0.0f,
-     0.0f,
+     player.hitbox.x,
+     player.hitbox.y,
     (float) player.sprite.width/3,
     (float) player.sprite.height
    };
    player.hitbox = (Rectangle) {
      GetScreenWidth()/2.0f - 30,
      GetScreenHeight()/2.0f - 30,
-     70,
-     70
+     (float) player.sprite.width/3,
+     (float) player.sprite.height
    };
-
+/*
+  heart.sprite = LoadTexture("assets/gfx/health.png");
+  heart.hitbox = (Rectangle) {
+    GetRandomValue(0, screenWidth - heart.sprite.width),
+    GetRandomValue(0, screenHeight - heart.sprite.height),
+    (float) heart.sprite.width/3,
+    (float) heart.sprite.height
+   };
+   heart.active = true;
+*/
    ball.position = (Vector2){ 50, 50 };
    ball.speed = (Vector2){ 400.0f,  300.0f };
    ball.radius = 20;
@@ -129,29 +150,28 @@ void updateGame(void)
 
   switch(currentScreen) {
     case TITLE:
-        if (IsKeyPressed(KEY_UP)) titleSelected++;
-        if (IsKeyPressed(KEY_DOWN)) titleSelected--;
+        if (INPUT_UP_PRESSED) titleSelected++;
+        if (INPUT_DOWN_PRESSED) titleSelected--;
         if (titleSelected > 0) titleSelected--;
         if (titleSelected < -2) titleSelected++;
 
-        if ((titleSelected == 0) && (IsKeyPressed(KEY_ENTER))) currentScreen = GAMEPLAY;
-        if ((titleSelected == -1) && (IsKeyPressed(KEY_ENTER))) currentScreen = CREDITS;
-        if ((titleSelected == -2) && (IsKeyPressed(KEY_ENTER))) OpenURL("https://canneddonuts.itch.io/");
+        if ((titleSelected == 0) && (INPUT_OPTION_PRESSED)) currentScreen = GAMEPLAY;
+        if ((titleSelected == -1) && (INPUT_OPTION_PRESSED)) currentScreen = CREDITS;
+        if ((titleSelected == -2) && (INPUT_OPTION_PRESSED)) OpenURL("https://canneddonuts.itch.io/");
      break;
     case GAMEPLAY:
 
      if (IsKeyPressed(KEY_M)) mute = !mute;
 
-    if (IsKeyPressed(KEY_ENTER)) pause = !pause;
+    if (INPUT_OPTION_PRESSED) pause = !pause;
 
      if (!pause) {
        // Controls
-       if (IsKeyDown(KEY_LEFT)) player.hitbox.x -= GetFrameTime() * player.speed;
-       if (IsKeyDown(KEY_RIGHT)) player.hitbox.x += GetFrameTime() * player.speed;
-       if (IsKeyDown(KEY_UP)) player.hitbox.y -= GetFrameTime() * player.speed;
-       if (IsKeyDown(KEY_DOWN)) player.hitbox.y += GetFrameTime() * player.speed;
-       if (IsKeyDown(KEY_X)) {
-         // player.speed *= 2;
+       if (INPUT_LEFT_DOWN) player.hitbox.x -= GetFrameTime() * player.speed;
+       if (INPUT_RIGHT_DOWN) player.hitbox.x += GetFrameTime() * player.speed;
+       if (INPUT_UP_DOWN) player.hitbox.y -= GetFrameTime() * player.speed;
+       if (INPUT_DOWN_DOWN) player.hitbox.y += GetFrameTime() * player.speed;
+       if (INPUT_DASH_DOWN) {
          player.speed = 600.0f;
          if (player.currentframe != 1) player.currentframe = 2;
        } else player.speed = 300.0f;
@@ -159,6 +179,8 @@ void updateGame(void)
 
        player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
        player.frameRec.x = (float)player.currentframe*(float)player.sprite.width/3;
+
+    //   heart.sprite_pos = (Vector2){ heart.hitbox.x, heart.hitbox.y };
 
        // Player to da wallz collies
        if ((player.hitbox.x + player.hitbox.width) >= GetScreenWidth()) player.hitbox.x = GetScreenWidth() - player.hitbox.width;
@@ -181,6 +203,7 @@ void updateGame(void)
          currentScreen = GAMEOVER;
        }
 
+
         if (ball.active) {
           score++;
           // movement of the ball
@@ -188,6 +211,7 @@ void updateGame(void)
           ball.position.y += GetFrameTime() * ball.speed.y;
 
           if (score >= bestscore)  bestscore = score;
+
           // Ballz to da wallz collies
           if ((ball.position.x >= (GetScreenWidth() - ball.radius)) || (ball.position.x <= ball.radius)) {
             ball.speed.x *= -1.0f;
@@ -212,19 +236,19 @@ void updateGame(void)
 
       break;
     case GAMEOVER:
-        if (IsKeyPressed(KEY_UP)) gameoverSelected++;
-        if (IsKeyPressed(KEY_DOWN)) gameoverSelected--;
+        if (INPUT_UP_PRESSED) gameoverSelected++;
+        if (INPUT_DOWN_PRESSED) gameoverSelected--;
         if (gameoverSelected > 0) gameoverSelected--;
         if (gameoverSelected < -1) gameoverSelected++;
 
-        if ((gameoverSelected == 0) && (IsKeyPressed(KEY_ENTER)))
+        if ((gameoverSelected == 0) && (INPUT_OPTION_PRESSED))
           currentScreen = GAMEPLAY;
 
-        if ((gameoverSelected == -1) && (IsKeyPressed(KEY_ENTER)))
+        if ((gameoverSelected == -1) && (INPUT_OPTION_PRESSED))
           currentScreen = TITLE;
         break;
     case CREDITS:
-        if (IsKeyPressed(KEY_ENTER)) currentScreen = TITLE;
+        if (INPUT_OPTION_PRESSED) currentScreen = TITLE;
       default: break;
   }
 }
@@ -241,12 +265,12 @@ void drawGame(void)
           DrawRectangle(0, 0, screenWidth, screenHeight, ORANGE);
           DrawText("Controls", 10, 10, 30, PURPLE);
           DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, WHITE);
-          DrawText("Press the arrow keys to move and 'X' to dash", 10, 40, 10, RED);
-          DrawText("Press 'ENTER' to pause", 10, 60, 10, RED);
+          DrawText("Press the arrow keys or 'DPAD' to move and 'X' to dash", 10, 40, 10, RED);
+          DrawText("Press 'ENTER' or 'START' to pause", 10, 60, 10, RED);
           DrawText("Press 'M' to mute", 10, 80, 10, RED);
           DrawText("Press 'Left-ALT' + 'F' for full screen", 10, 100, 10, RED);
           DrawText("Press 'R' to restart", 10, 120, 10, RED);
-          DrawText("Press 'ENTER' to select an option", 10, 140, 10, RED);
+          DrawText("Press 'ENTER' or 'START' to select an option", 10, 140, 10, RED);
           DrawText("Avoid", 330, 20, 50, BLUE);
           if (titleSelected == 0) DrawText("PLAY", 360, 220, 20, WHITE);
           else DrawText("PLAY", 360, 220, 20, BLUE);
@@ -270,6 +294,7 @@ void drawGame(void)
             DrawRectangleRec(player.hitbox, BLUE);
           }
           if (ball.active) DrawCircleV(ball.position, (float)ball.radius, ball.color);
+        //  if (heart.active) DrawTexture(heart.sprite, heart.sprite_pos.x, heart.sprite_pos.y, RAYWHITE);
           DrawTextureRec(player.sprite, player.frameRec, player.sprite_pos, WHITE);
           if (pause && ((pauseTimer/30)%2)) DrawText("PAUSED", 330, 190, 30, PURPLE);
           break;
@@ -308,10 +333,18 @@ void gameReset(void)
    player.hitbox = (Rectangle) {
      GetScreenWidth()/2.0f - 30,
      GetScreenHeight()/2.0f - 30,
-     70,
-     70
+     (float) player.sprite.width/3,
+     (float) player.sprite.height
    };
-
+/*
+   heart.hitbox = (Rectangle) {
+     GetRandomValue(0, screenWidth - heart.sprite.width),
+     GetRandomValue(0, screenHeight - heart.sprite.height),
+     (float) heart.sprite.width/3,
+     (float) heart.sprite.height
+    };
+    heart.active = true;
+*/
    ball.position = (Vector2){ 50, 50 };
    ball.radius = 20;
    ball.active = true;
@@ -334,4 +367,5 @@ void unloadGame(void)
 {
   UnloadSound(fxbounce);
   UnloadTexture(player.sprite);
+  //UnloadTexture(heart.sprite);
 }
