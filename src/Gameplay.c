@@ -45,7 +45,7 @@ void InitGameplayScreen(void)
    (float) heart.sprite.width,
    (float) heart.sprite.height
   };
-  heart.active = false;
+  heart.active = true;
 
   ball.position = (Vector2){ 50, 50 };
   ball.speed = (Vector2){ 400.0f,  300.0f };
@@ -79,7 +79,7 @@ void ResetGameplayScreen(void)
      (float) heart.sprite.width,
      (float) heart.sprite.height
     };
-    heart.active = false;
+    heart.active = true;
 
    ball.position = (Vector2){ 50, 50 };
    ball.radius = 20;
@@ -93,20 +93,20 @@ void ResetGameplayScreen(void)
 
 void UpdateGameplayScreen(void)
 {
-       if (IsKeyPressed(KEY_M)) mute = !mute;
+   if (IsKeyPressed(KEY_M)) mute = !mute;
 
-      if (INPUT_OPTION_PRESSED) pause = !pause;
+   if (INPUT_OPTION_PRESSED) pause = !pause;
 
-       if (!pause) {
+   if (!pause) {
          // Controls
-         if (INPUT_LEFT_DOWN) player.hitbox.x -= GetFrameTime() * player.speed;
-         if (INPUT_RIGHT_DOWN) player.hitbox.x += GetFrameTime() * player.speed;
-         if (INPUT_UP_DOWN) player.hitbox.y -= GetFrameTime() * player.speed;
-         if (INPUT_DOWN_DOWN) player.hitbox.y += GetFrameTime() * player.speed;
-         if (INPUT_DASH_DOWN) {
-           player.speed = 600.0f;
-           if (player.currentframe != 1) player.currentframe = 2;
-         } else player.speed = 300.0f;
+       if (INPUT_LEFT_DOWN) player.hitbox.x -= GetFrameTime() * player.speed;
+       if (INPUT_RIGHT_DOWN) player.hitbox.x += GetFrameTime() * player.speed;
+       if (INPUT_UP_DOWN) player.hitbox.y -= GetFrameTime() * player.speed;
+       if (INPUT_DOWN_DOWN) player.hitbox.y += GetFrameTime() * player.speed;
+       if (INPUT_DASH_DOWN) {
+         player.speed = 600.0f;
+         if (player.currentframe != 1) player.currentframe = 2;
+       } else player.speed = 300.0f;
 
 
          player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
@@ -114,16 +114,7 @@ void UpdateGameplayScreen(void)
 
          heart.sprite_pos = (Vector2){ heart.hitbox.x, heart.hitbox.y };
 
-         if (score == 1000) heart.active = true;
-         if (score == 2000) heart.active = true;
-         if (score == 3000) heart.active = true;
-         if (score == 4000) heart.active = true;
-         if (score == 5000) heart.active = true;
-         if (score == 6000) heart.active = true;
-         if (score == 7000) heart.active = true;
-         if (score == 8000) heart.active = true;
-         if (score == 9000) heart.active = true;
-         if (score == 10000) heart.active = true;
+         if (score % 1000 == 0) heart.active = true;
 
          // Player to da wallz collies
          if ((player.hitbox.x + player.hitbox.width) >= GetScreenWidth()) player.hitbox.x = GetScreenWidth() - player.hitbox.width;

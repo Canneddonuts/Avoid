@@ -19,14 +19,10 @@ void UpdateCreditsScreen(void)
 void DrawCreditsScreen(void)
 {
   DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), GREEN);
-
   DrawText("Avoid", 330, 20, 50, MAGENTA);
-
   DrawText("Programming and Art by Return0ne", 10, 210, 20, BLUE);
-
   DrawText("Powered by raylib 4.0", 10, 240, 20, BLUE);
-
   DrawText("A Canneddonuts project 2022", 10, 270, 40, RED);
-
+  DrawText(TextFormat("Build compiled on %s", __DATE__), 10, 310, 30, YELLOW);
   DrawText("Press 'ENTER' ", 10, 350, 20, WHITE);
 }
