@@ -9,8 +9,6 @@
 #include "../include/raylib.h"
 
 #include "Screens.h"
-#include "Controls.h"
-
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
@@ -21,7 +19,7 @@ static const int screenWidth  = 800;
 static const int screenHeight = 450;
 
 GameScreen currentScreen = 0;
-
+Texture2D background = { 0 };
 
 // Game functions
 static void gameSetup(void);
@@ -61,6 +59,7 @@ void gameSetup(void)
    currentScreen = TITLE;
 
    InitGameplayScreen();
+   InitTitleScreen();
 }
 
 void updateGame(void)
@@ -68,7 +67,7 @@ void updateGame(void)
   // code that runs as long as the program is running
  if ((IsKeyDown(KEY_LEFT_ALT)) && (IsKeyPressed(KEY_F))) ToggleFullscreen();
 
-  switch(currentScreen) {
+  switch (currentScreen) {
     case TITLE:  UpdateTitleScreen(); break;
     case GAMEPLAY: UpdateGameplayScreen(); break;
     case GAMEOVER: UpdateGameoverScreen(); break;
@@ -84,7 +83,7 @@ void drawGame(void)
 
       ClearBackground(RAYWHITE);
 
-      switch(currentScreen) {
+      switch (currentScreen) {
         case TITLE: DrawTitleScreen(); break;
         case GAMEPLAY: DrawGameplayScreen(); break;
         case GAMEOVER: DrawGameoverScreen(); break;
@@ -104,4 +103,5 @@ void gameLoop(void)
 void unloadGame(void)
 {
   UnloadGameplayScreen();
+  UnloadTitleScreen();
 }

@@ -34,7 +34,7 @@ void UpdateGameoverScreen(void)
 
 void DrawGameoverScreen(void)
 {
-  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLUE);
+  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
   DrawText("GAMEOVER", 250, 20, 50, RED);
   if (gameoverSelected == 0) DrawText("RETRY", 350, 200, 20, WHITE);
   else DrawText("RETRY", 350, 200, 20, RED);

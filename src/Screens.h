@@ -15,8 +15,10 @@ extern GameScreen currentScreen;
 
 void gameReset(void);
 
+void InitTitleScreen(void);
 void UpdateTitleScreen(void);
 void DrawTitleScreen(void);
+void UnloadTitleScreen(void);
 
 
 void InitGameplayScreen(void);

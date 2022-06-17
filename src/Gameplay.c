@@ -12,6 +12,7 @@
 #include "Controls.h"
 #include "Gameplay.h"
 #include "Score.h"
+#include "Textures.h"
 
 int score = 0, bestscore = 0;
 
@@ -38,12 +39,12 @@ void InitGameplayScreen(void)
     (float) player.sprite.height
   };
 
- heart.sprite = LoadTexture("assets/gfx/health.png");
- heart.hitbox = (Rectangle) {
-   GetRandomValue(0, GetScreenWidth() - heart.sprite.width),
-   GetRandomValue(0, GetScreenHeight() - heart.sprite.height),
-   (float) heart.sprite.width,
-   (float) heart.sprite.height
+  heart.sprite = LoadTexture("assets/gfx/health.png");
+  heart.hitbox = (Rectangle) {
+    GetRandomValue(0, GetScreenWidth() - heart.sprite.width),
+    GetRandomValue(0, GetScreenHeight() - heart.sprite.height),
+    (float) heart.sprite.width,
+    (float) heart.sprite.height
   };
   heart.active = true;
 
@@ -55,7 +56,7 @@ void InitGameplayScreen(void)
   ball.active = true;
 
   pause = 0;
-  mute = 0;
+  mute = true;
   DebugMode = 0;
   pauseTimer = 0;
 }
@@ -78,8 +79,8 @@ void ResetGameplayScreen(void)
      GetRandomValue(0, GetScreenHeight() - heart.sprite.height),
      (float) heart.sprite.width,
      (float) heart.sprite.height
-    };
-    heart.active = true;
+   };
+   heart.active = true;
 
    ball.position = (Vector2){ 50, 50 };
    ball.radius = 20;
@@ -148,11 +149,12 @@ void UpdateGameplayScreen(void)
 
           if (ball.active) {
             score++;
+
+            if (score >= bestscore)  bestscore = score;
+
             // movement of the ball
             ball.position.x += GetFrameTime() * ball.speed.x;
             ball.position.y += GetFrameTime() * ball.speed.y;
-
-            if (score >= bestscore)  bestscore = score;
 
             // Ballz to da wallz collies
             if ((ball.position.x >= (GetScreenWidth() - ball.radius)) || (ball.position.x <= ball.radius)) {
@@ -179,7 +181,7 @@ void UpdateGameplayScreen(void)
 
 void DrawGameplayScreen(void)
 {
-  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
+  DrawTexture(background, 0, 0, RAYWHITE);
   DrawFPS(10, 430);
   DrawText(TextFormat("HP: %i", player.hp), 10, 10, 20, RED);
   DrawText(TextFormat("SCORE: %i", score), 10, 30, 20, BLUE);
@@ -192,7 +194,7 @@ void DrawGameplayScreen(void)
   }
   if (ball.active) DrawCircleV(ball.position, (float)ball.radius, ball.color);
   if (heart.active) DrawTexture(heart.sprite, heart.sprite_pos.x, heart.sprite_pos.y, RAYWHITE);
-  DrawTextureRec(player.sprite, player.frameRec, player.sprite_pos, WHITE);
+  DrawTextureRec(player.sprite, player.frameRec, player.sprite_pos, RAYWHITE);
   if (pause && ((pauseTimer/30)%2)) DrawText("PAUSED", 330, 190, 30, PURPLE);
 }
 
