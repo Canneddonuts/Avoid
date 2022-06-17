@@ -39,6 +39,18 @@ void InitGameplayScreen(void)
     (float) player.sprite.height
   };
 
+  enemy.sprite = LoadTexture("assets/gfx/enemy.png");
+  enemy.currentframe = 0;
+  enemy.speed = 100.0f;
+  enemy.hp = 30;
+  enemy.hitbox = (Rectangle) {
+    740,
+    10,
+    (float) enemy.sprite.width,
+    (float) enemy.sprite.height
+  };
+
+
   heart.sprite = LoadTexture("assets/gfx/health.png");
   heart.hitbox = (Rectangle) {
     GetRandomValue(0, GetScreenWidth() - heart.sprite.width),
@@ -47,13 +59,6 @@ void InitGameplayScreen(void)
     (float) heart.sprite.height
   };
   heart.active = true;
-
-  ball.position = (Vector2){ 50, 50 };
-  ball.speed = (Vector2){ 400.0f,  300.0f };
-  ball.radius = 20;
-  ball.growth = 2;
-  ball.color = MAROON;
-  ball.active = true;
 
   pause = 0;
   mute = true;
@@ -74,6 +79,16 @@ void ResetGameplayScreen(void)
      (float) player.sprite.height
    };
 
+   enemy.currentframe = 0;
+   enemy.speed = 100.0f;
+   enemy.hp = 30;
+   enemy.hitbox = (Rectangle) {
+     740,
+     10,
+     (float) enemy.sprite.width,
+     (float) enemy.sprite.height
+   };
+
    heart.hitbox = (Rectangle) {
      GetRandomValue(0, GetScreenWidth() - heart.sprite.width),
      GetRandomValue(0, GetScreenHeight() - heart.sprite.height),
@@ -82,9 +97,6 @@ void ResetGameplayScreen(void)
    };
    heart.active = true;
 
-   ball.position = (Vector2){ 50, 50 };
-   ball.radius = 20;
-   ball.active = true;
 
    DebugMode = 0;
 
@@ -99,7 +111,7 @@ void UpdateGameplayScreen(void)
    if (INPUT_OPTION_PRESSED) pause = !pause;
 
    if (!pause) {
-         // Controls
+
        if (INPUT_LEFT_DOWN) player.hitbox.x -= GetFrameTime() * player.speed;
        if (INPUT_RIGHT_DOWN) player.hitbox.x += GetFrameTime() * player.speed;
        if (INPUT_UP_DOWN) player.hitbox.y -= GetFrameTime() * player.speed;
@@ -109,11 +121,11 @@ void UpdateGameplayScreen(void)
          if (player.currentframe != 1) player.currentframe = 2;
        } else player.speed = 300.0f;
 
-
          player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
          player.frameRec.x = (float)player.currentframe*(float)player.sprite.width/3;
 
          heart.sprite_pos = (Vector2){ heart.hitbox.x, heart.hitbox.y };
+         enemy.sprite_pos = (Vector2){ enemy.hitbox.x, enemy.hitbox.y };
 
          if (score % 1000 == 0) heart.active = true;
 
@@ -123,8 +135,6 @@ void UpdateGameplayScreen(void)
 
          if ((player.hitbox.y + player.hitbox.height) >= GetScreenHeight()) player.hitbox.y = GetScreenHeight() - player.hitbox.height;
          else if (player.hitbox.y <= 0) player.hitbox.y = 0;
-
-         if (IsKeyPressed(KEY_B)) ball.active = !ball.active;
 
          if (IsKeyPressed(KEY_D)) DebugMode = !DebugMode;
 
@@ -147,33 +157,21 @@ void UpdateGameplayScreen(void)
              }
          }
 
-          if (ball.active) {
-            score++;
+         if (enemy.hp != 0) {
+           score++;
+           if (score >= bestscore)  bestscore = score;
 
-            if (score >= bestscore)  bestscore = score;
+           enemy.hitbox.y += GetFrameTime() * enemy.speed;
 
-            // movement of the ball
-            ball.position.x += GetFrameTime() * ball.speed.x;
-            ball.position.y += GetFrameTime() * ball.speed.y;
+           if (((enemy.hitbox.y + enemy.hitbox.height) >= GetScreenHeight()
+           || (enemy.hitbox.y <= 0))) enemy.speed *= -1.0f;
 
-            // Ballz to da wallz collies
-            if ((ball.position.x >= (GetScreenWidth() - ball.radius)) || (ball.position.x <= ball.radius)) {
-              ball.speed.x *= -1.0f;
-              if (!mute) PlaySoundMulti(fxbounce);
-            }
+           if (CheckCollisionRecs(player.hitbox, enemy.hitbox)) {
+             player.hp -= GetFrameTime() * 3.0f;
+             player.currentframe = 1;
+           } else player.currentframe = 0;
+         }
 
-            if ((ball.position.y >= (GetScreenHeight() - ball.radius)) || (ball.position.y <= ball.radius)) {
-              ball.speed.y *= -1.0f;
-              if (!mute) PlaySoundMulti(fxbounce);
-            }
-
-            if (CheckCollisionCircleRec(ball.position, ball.radius, player.hitbox)) {
-              player.hp -= GetFrameTime() * 3.0f;
-              player.currentframe = 1;
-            } else player.currentframe = 0;
-
-            if (ball.radius <= 100)  ball.radius += GetFrameTime() * ball.growth;
-          }
 
        }
        else pauseTimer++;
@@ -186,14 +184,12 @@ void DrawGameplayScreen(void)
   DrawText(TextFormat("HP: %i", player.hp), 10, 10, 20, RED);
   DrawText(TextFormat("SCORE: %i", score), 10, 30, 20, BLUE);
   if (DebugMode) {
-    DrawText(TextFormat("BALL SIZE: %f", ball.radius), 10, 50, 20, GREEN);
-    DrawText(TextFormat("BALL POS X: %f, BALL POS Y: %f", ball.position.x, ball.position.y), 10, 70, 20, GREEN);
-    DrawText(TextFormat("BALL SPEED X: %f, BALL SPEED Y: %f", ball.speed.x, ball.speed.y), 10, 90, 20, GREEN);
     DrawRectangleRec(player.hitbox, BLUE);
     DrawRectangleRec(heart.hitbox, GREEN);
+    DrawRectangleRec(enemy.hitbox, BLACK);
   }
-  if (ball.active) DrawCircleV(ball.position, (float)ball.radius, ball.color);
   if (heart.active) DrawTexture(heart.sprite, heart.sprite_pos.x, heart.sprite_pos.y, RAYWHITE);
+  DrawTexture(enemy.sprite, enemy.sprite_pos.x, enemy.sprite_pos.y, RAYWHITE);
   DrawTextureRec(player.sprite, player.frameRec, player.sprite_pos, RAYWHITE);
   if (pause && ((pauseTimer/30)%2)) DrawText("PAUSED", 330, 190, 30, PURPLE);
 }
@@ -203,6 +199,7 @@ void UnloadGameplayScreen()
   UnloadSound(fxbounce);
   UnloadTexture(player.sprite);
   UnloadTexture(heart.sprite);
+  UnloadTexture(enemy.sprite);
 }
 
 void gameReset(void)

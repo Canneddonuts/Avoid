@@ -9,16 +9,7 @@
 #ifndef GAMEPLAY_HEADER
 #define GAMEPLAY_HEADER
 
-struct Ball {
-    Vector2 position;
-    Vector2 speed;
-    float radius;
-    float growth;
-    Color color;
-    bool active;
-};
-
-struct Player {
+struct Actor {
     Texture2D sprite;
     float speed;
     int hp;
@@ -35,8 +26,8 @@ struct Item {
     bool active;
 };
 
-struct Player player = { 0 };
-struct Ball ball = { 0 };
+struct Actor player = { 0 };
+struct Actor enemy = { 0 };
 struct Item heart = { 0 };
 int pauseTimer;
 Sound fxbounce = { 0 };
