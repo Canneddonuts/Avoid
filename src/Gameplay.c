@@ -22,43 +22,56 @@ void InitGameplayScreen(void)
 
   SetMasterVolume(0.2);
 
-  player.sprite = LoadTexture("assets/gfx/player.png");
+  player_sprite = LoadTexture("assets/gfx/player.png");
   player.currentframe = 0;
   player.speed = 300.0f;
   player.hp = 30;
   player.frameRec = (Rectangle) {
     player.hitbox.x,
     player.hitbox.y,
-   (float) player.sprite.width/3,
-   (float) player.sprite.height
+   (float) player_sprite.width/3,
+   (float) player_sprite.height
   };
   player.hitbox = (Rectangle) {
     GetScreenWidth()/2.0f - 30,
     GetScreenHeight()/2.0f - 30,
-    (float) player.sprite.width/3,
-    (float) player.sprite.height
+    (float) player_sprite.width/3,
+    (float) player_sprite.height
   };
 
-  enemy.sprite = LoadTexture("assets/gfx/enemy.png");
+  enemy_sprite = LoadTexture("assets/gfx/enemy.png");
   enemy.currentframe = 0;
   enemy.speed = 100.0f;
   enemy.hp = 30;
   enemy.hitbox = (Rectangle) {
     740,
     10,
-    (float) enemy.sprite.width,
-    (float) enemy.sprite.height
+    (float) enemy_sprite.width,
+    (float) enemy_sprite.height
   };
 
 
-  heart.sprite = LoadTexture("assets/gfx/health.png");
+  heart_sprite = LoadTexture("assets/gfx/health.png");
   heart.hitbox = (Rectangle) {
-    GetRandomValue(0, GetScreenWidth() - heart.sprite.width),
-    GetRandomValue(0, GetScreenHeight() - heart.sprite.height),
-    (float) heart.sprite.width,
-    (float) heart.sprite.height
+    GetRandomValue(0, GetScreenWidth() - heart_sprite.width),
+    GetRandomValue(0, GetScreenHeight() - heart_sprite.height),
+    (float) heart_sprite.width,
+    (float) heart_sprite.height
   };
   heart.active = true;
+
+  firework_sprite = LoadTexture("assets/gfx/firework.png");
+  for (int i = 0; i < MAX_FIREWORKS; i++) {
+    fireworks[i].currentframe = 0;
+    fireworks[i].speed = 200.0f;
+    fireworks[i].hp = 1;
+    fireworks[i].hitbox = (Rectangle) {
+      50 * i,
+      100 * i,
+      (float) firework_sprite.width,
+      (float) firework_sprite.height
+    };
+  }
 
   pause = 0;
   mute = true;
@@ -75,8 +88,8 @@ void ResetGameplayScreen(void)
    player.hitbox = (Rectangle) {
      GetScreenWidth()/2.0f - 30,
      GetScreenHeight()/2.0f - 30,
-     (float) player.sprite.width/3,
-     (float) player.sprite.height
+     (float) player_sprite.width/3,
+     (float) player_sprite.height
    };
 
    enemy.currentframe = 0;
@@ -85,18 +98,29 @@ void ResetGameplayScreen(void)
    enemy.hitbox = (Rectangle) {
      740,
      10,
-     (float) enemy.sprite.width,
-     (float) enemy.sprite.height
+     (float) enemy_sprite.width,
+     (float) enemy_sprite.height
    };
 
    heart.hitbox = (Rectangle) {
-     GetRandomValue(0, GetScreenWidth() - heart.sprite.width),
-     GetRandomValue(0, GetScreenHeight() - heart.sprite.height),
-     (float) heart.sprite.width,
-     (float) heart.sprite.height
+     GetRandomValue(0, GetScreenWidth() - heart_sprite.width),
+     GetRandomValue(0, GetScreenHeight() - heart_sprite.height),
+     (float) heart_sprite.width,
+     (float) heart_sprite.height
    };
    heart.active = true;
 
+   for (int i = 0; i < MAX_FIREWORKS; i++) {
+     fireworks[i].currentframe = 0;
+     fireworks[i].speed = 200.0f;
+     fireworks[i].hp = 1;
+     fireworks[i].hitbox = (Rectangle) {
+       50 * i,
+       100 * i,
+       (float) firework_sprite.width,
+       (float) firework_sprite.height
+     };
+   }
 
    DebugMode = 0;
 
@@ -122,10 +146,14 @@ void UpdateGameplayScreen(void)
        } else player.speed = 300.0f;
 
          player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
-         player.frameRec.x = (float)player.currentframe*(float)player.sprite.width/3;
+         player.frameRec.x = (float)player.currentframe*(float)player_sprite.width/3;
 
          heart.sprite_pos = (Vector2){ heart.hitbox.x, heart.hitbox.y };
          enemy.sprite_pos = (Vector2){ enemy.hitbox.x, enemy.hitbox.y };
+
+         for (int i = 0; i < MAX_FIREWORKS; i++) {
+           fireworks[i].sprite_pos = (Vector2){ fireworks[i].hitbox.x, fireworks[i].hitbox.y };
+         }
 
          if (score % 1000 == 0) heart.active = true;
 
@@ -151,8 +179,8 @@ void UpdateGameplayScreen(void)
          if (heart.active) {
              if (CheckCollisionRecs(player.hitbox,  heart.hitbox)) {
                  player.hp = 30;
-                 heart.hitbox.x = GetRandomValue(0, GetScreenWidth() - heart.sprite.width);
-                 heart.hitbox.y = GetRandomValue(0, GetScreenHeight() - heart.sprite.height);
+                 heart.hitbox.x = GetRandomValue(0, GetScreenWidth() - heart_sprite.width);
+                 heart.hitbox.y = GetRandomValue(0, GetScreenHeight() - heart_sprite.height);
                  heart.active = false;
              }
          }
@@ -172,6 +200,12 @@ void UpdateGameplayScreen(void)
            } else player.currentframe = 0;
          }
 
+         for (int i = 0; i <= MAX_FIREWORKS; i++) {
+           if (CheckCollisionRecs(player.hitbox, fireworks[i].hitbox)) {
+             player.hp -= GetFrameTime() * 3.0f;
+             player.currentframe = 1;
+           }
+         }
 
        }
        else pauseTimer++;
@@ -181,25 +215,32 @@ void DrawGameplayScreen(void)
 {
   DrawTexture(background, 0, 0, RAYWHITE);
   DrawFPS(10, 430);
-  DrawText(TextFormat("HP: %i", player.hp), 10, 10, 20, RED);
-  DrawText(TextFormat("SCORE: %i", score), 10, 30, 20, BLUE);
   if (DebugMode) {
     DrawRectangleRec(player.hitbox, BLUE);
     DrawRectangleRec(heart.hitbox, GREEN);
     DrawRectangleRec(enemy.hitbox, BLACK);
+    for (int i = 0; i < MAX_FIREWORKS; i++) {
+      DrawRectangleRec(fireworks[i].hitbox, BLACK);
+    }
   }
-  if (heart.active) DrawTexture(heart.sprite, heart.sprite_pos.x, heart.sprite_pos.y, RAYWHITE);
-  DrawTexture(enemy.sprite, enemy.sprite_pos.x, enemy.sprite_pos.y, RAYWHITE);
-  DrawTextureRec(player.sprite, player.frameRec, player.sprite_pos, RAYWHITE);
+  if (heart.active) DrawTexture(heart_sprite, heart.sprite_pos.x, heart.sprite_pos.y, RAYWHITE);
+  DrawTexture(enemy_sprite, enemy.sprite_pos.x, enemy.sprite_pos.y, RAYWHITE);
+  for (int i = 0; i < MAX_FIREWORKS; i++) {
+    DrawTexture(firework_sprite, fireworks[i].sprite_pos.x, fireworks[i].sprite_pos.y, RAYWHITE);
+  }
+  DrawTextureRec(player_sprite, player.frameRec, player.sprite_pos, RAYWHITE);
+  DrawText(TextFormat("HP: %i", player.hp), 10, 10, 20, RED);
+  DrawText(TextFormat("SCORE: %i", score), 10, 30, 20, BLUE);
   if (pause && ((pauseTimer/30)%2)) DrawText("PAUSED", 330, 190, 30, PURPLE);
 }
 
 void UnloadGameplayScreen()
 {
   UnloadSound(fxbounce);
-  UnloadTexture(player.sprite);
-  UnloadTexture(heart.sprite);
-  UnloadTexture(enemy.sprite);
+  UnloadTexture(player_sprite);
+  UnloadTexture(heart_sprite);
+  UnloadTexture(enemy_sprite);
+  UnloadTexture(firework_sprite);
 }
 
 void gameReset(void)

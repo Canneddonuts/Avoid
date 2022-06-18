@@ -10,5 +10,9 @@
 #define TEXTURES_HEADER
 
 extern Texture2D background;
+extern Texture2D player_sprite;
+extern Texture2D heart_sprite;
+extern Texture2D enemy_sprite;
+extern Texture2D firework_sprite;
 
 #endif

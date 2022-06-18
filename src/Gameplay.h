@@ -9,8 +9,9 @@
 #ifndef GAMEPLAY_HEADER
 #define GAMEPLAY_HEADER
 
+#define MAX_FIREWORKS 5
+
 struct Actor {
-    Texture2D sprite;
     float speed;
     int hp;
     int currentframe;
@@ -20,7 +21,6 @@ struct Actor {
 };
 
 struct Item {
-    Texture2D sprite;
     Vector2 sprite_pos;
     Rectangle hitbox;
     bool active;
@@ -28,6 +28,7 @@ struct Item {
 
 struct Actor player = { 0 };
 struct Actor enemy = { 0 };
+struct Actor fireworks[MAX_FIREWORKS] = { 0 };
 struct Item heart = { 0 };
 int pauseTimer;
 Sound fxbounce = { 0 };

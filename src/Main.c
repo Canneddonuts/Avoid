@@ -19,7 +19,12 @@ static const int screenWidth  = 800;
 static const int screenHeight = 450;
 
 GameScreen currentScreen = 0;
-Texture2D background = { 0 };
+
+Texture2D background;
+Texture2D player_sprite;
+Texture2D heart_sprite;
+Texture2D enemy_sprite;
+Texture2D firework_sprite;
 
 // Game functions
 static void gameSetup(void);
