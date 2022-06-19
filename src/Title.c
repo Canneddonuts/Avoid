@@ -15,6 +15,19 @@
 
 int titleSelected = 0;
 
+void DrawScore(void)
+{
+  if (bestscore >= 10000) {
+     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, YELLOW);
+  } else if (bestscore >= 5000) {
+     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, DARKGRAY);
+  } else if (bestscore >= 1000) {
+     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, DARKBROWN);
+  } else {
+     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, BLUE);
+  }
+}
+
 void InitTitleScreen(void)
 {
   background = LoadTexture("assets/gfx/background.png");
@@ -36,7 +49,7 @@ void DrawTitleScreen(void)
 {
   DrawTexture(background, 0, 0, GRAY);
   DrawText("Controls", 10, 10, 30, BLUE);
-  DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, WHITE);
+  DrawScore();
   DrawText("Press the arrow keys or 'DPAD' to move and 'X' to dash", 10, 40, 10, WHITE);
   DrawText("Press 'ENTER' or 'START' to pause", 10, 60, 10, WHITE);
   DrawText("Press 'M' to mute", 10, 80, 10, WHITE);

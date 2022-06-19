@@ -33,8 +33,8 @@ void InitGameplayScreen(void)
    (float) player_sprite.height
   };
   player.hitbox = (Rectangle) {
-    GetScreenWidth()/2.0f - 30,
-    GetScreenHeight()/2.0f - 30,
+    0,
+    50,
     (float) player_sprite.width/3,
     (float) player_sprite.height
   };
@@ -44,7 +44,7 @@ void InitGameplayScreen(void)
   enemy.speed = 100.0f;
   enemy.hp = 30;
   enemy.hitbox = (Rectangle) {
-    740,
+    690,
     10,
     (float) enemy_sprite.width,
     (float) enemy_sprite.height
@@ -63,11 +63,11 @@ void InitGameplayScreen(void)
   firework_sprite = LoadTexture("assets/gfx/firework.png");
   for (int i = 0; i < MAX_FIREWORKS; i++) {
     fireworks[i].currentframe = 0;
-    fireworks[i].speed = 200.0f;
-    fireworks[i].hp = 1;
+    fireworks[i].speed = 300.0f;
+    fireworks[i].hp = 0;
     fireworks[i].hitbox = (Rectangle) {
-      50 * i,
-      100 * i,
+      630,
+      GetRandomValue(0, GetScreenHeight()),
       (float) firework_sprite.width,
       (float) firework_sprite.height
     };
@@ -86,8 +86,8 @@ void ResetGameplayScreen(void)
    player.speed = 300.0f;
    player.hp = 30;
    player.hitbox = (Rectangle) {
-     GetScreenWidth()/2.0f - 30,
-     GetScreenHeight()/2.0f - 30,
+     0,
+     50,
      (float) player_sprite.width/3,
      (float) player_sprite.height
    };
@@ -96,7 +96,7 @@ void ResetGameplayScreen(void)
    enemy.speed = 100.0f;
    enemy.hp = 30;
    enemy.hitbox = (Rectangle) {
-     740,
+     690,
      10,
      (float) enemy_sprite.width,
      (float) enemy_sprite.height
@@ -112,11 +112,11 @@ void ResetGameplayScreen(void)
 
    for (int i = 0; i < MAX_FIREWORKS; i++) {
      fireworks[i].currentframe = 0;
-     fireworks[i].speed = 200.0f;
-     fireworks[i].hp = 1;
+     fireworks[i].speed = 300.0f;
+     fireworks[i].hp = 0;
      fireworks[i].hitbox = (Rectangle) {
-       50 * i,
-       100 * i,
+       630,
+       GetRandomValue(0, GetScreenHeight()),
        (float) firework_sprite.width,
        (float) firework_sprite.height
      };
@@ -200,10 +200,24 @@ void UpdateGameplayScreen(void)
            } else player.currentframe = 0;
          }
 
-         for (int i = 0; i <= MAX_FIREWORKS; i++) {
+         for (int i = 0; i < MAX_FIREWORKS; i++) {
            if (CheckCollisionRecs(player.hitbox, fireworks[i].hitbox)) {
              player.hp -= GetFrameTime() * 3.0f;
              player.currentframe = 1;
+           }
+
+           switch (fireworks[i].hp) {
+             case 0:
+                 fireworks[i].hitbox.x = enemy.hitbox.x - 20;
+                 fireworks[i].hitbox.y = enemy.hitbox.y - 20;
+
+                 if (GetRandomValue(0, 50) == 50) fireworks[i].hp = 1;
+                 break;
+             case 1:
+               fireworks[i].hitbox.x += GetFrameTime() * -fireworks[i].speed;
+               if (((fireworks[i].hitbox.x + -firework_sprite.width) > GetScreenWidth()
+               || (fireworks[i].hitbox.x <= -firework_sprite.width))) fireworks[i].hp = 0;
+               break;
            }
          }
 
@@ -218,8 +232,12 @@ void DrawGameplayScreen(void)
   if (DebugMode) {
     DrawRectangleRec(player.hitbox, BLUE);
     DrawRectangleRec(heart.hitbox, GREEN);
+    DrawText(TextFormat("enemy.hitbox.y: %f", enemy.hitbox.y), 10, 200, 20, RED);
+    DrawText(TextFormat("player.hitbox.y: %f", player.hitbox.y), 10, 230, 20, RED);
     DrawRectangleRec(enemy.hitbox, BLACK);
+    DrawText(TextFormat("firework_sprite.width: %d", firework_sprite.width), 10, 270, 20, RED);
     for (int i = 0; i < MAX_FIREWORKS; i++) {
+      DrawText(TextFormat("fireworks[i].hp: %d", fireworks[i].hp), 10, 250, 20, RED);
       DrawRectangleRec(fireworks[i].hitbox, BLACK);
     }
   }
