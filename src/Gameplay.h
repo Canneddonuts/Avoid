@@ -10,6 +10,7 @@
 #define GAMEPLAY_HEADER
 
 #define MAX_FIREWORKS 10
+#define MAX_PLAYER_HP 5
 
 struct Actor {
     float speed;
@@ -18,6 +19,7 @@ struct Actor {
     Vector2 sprite_pos;
     Rectangle frameRec;
     Rectangle hitbox;
+    Color color;
 };
 
 struct Item {
@@ -30,10 +32,11 @@ struct Actor player = { 0 };
 struct Actor enemy = { 0 };
 struct Actor fireworks[MAX_FIREWORKS] = { 0 };
 struct Item heart = { 0 };
-int pauseTimer;
 Sound fxbounce = { 0 };
 bool pause;
 bool mute;
+bool player_in;
+
 bool DebugMode;
 
 #endif
