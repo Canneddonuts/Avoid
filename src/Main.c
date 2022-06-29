@@ -22,7 +22,7 @@ GameScreen currentScreen = 0;
 
 Texture2D background;
 Texture2D player_sprite;
-Texture2D heart_sprite;
+Texture2D feather_sprite;
 Texture2D enemy_sprite;
 Texture2D firework_sprite;
 

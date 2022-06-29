@@ -26,7 +26,7 @@ void InitGameplayScreen(void)
   player_sprite = LoadTexture("assets/gfx/player.png");
   player.currentframe = 0;
   player.speed = 300.0f;
-  player.hp = MAX_PLAYER_HP;
+  player.hp = PLAYER_HP;
   player.frameRec = (Rectangle) {
     player.hitbox.x,
     player.hitbox.y,
@@ -46,7 +46,7 @@ void InitGameplayScreen(void)
 
   enemy_sprite = LoadTexture("assets/gfx/enemy.png");
   enemy.currentframe = 0;
-  enemy.speed = 100.0f;
+  enemy.speed = 2.0f;
   enemy.hp = 30;
   enemy.hitbox = (Rectangle) {
     690,
@@ -57,12 +57,12 @@ void InitGameplayScreen(void)
   enemy.color = RAYWHITE;
 
 
-  heart_sprite = LoadTexture("assets/gfx/health.png");
+  feather_sprite = LoadTexture("assets/gfx/feather.png");
   heart.hitbox = (Rectangle) {
-    GetRandomValue(0, GetScreenWidth() - heart_sprite.width),
-    GetRandomValue(0, GetScreenHeight() - heart_sprite.height),
-    (float) heart_sprite.width,
-    (float) heart_sprite.height
+    GetRandomValue(0, GetScreenWidth() - feather_sprite.width),
+    GetRandomValue(0, GetScreenHeight() - feather_sprite.height),
+    (float) feather_sprite.width,
+    (float) feather_sprite.height
   };
   heart.active = true;
 
@@ -91,7 +91,7 @@ void ResetGameplayScreen(void)
   // code to reset all variables without reloading assets
    player.currentframe = 0;
    player.speed = 300.0f;
-   player.hp = MAX_PLAYER_HP;
+   player.hp = PLAYER_HP;
    player.hitbox = (Rectangle) {
      0,
      50,
@@ -104,7 +104,7 @@ void ResetGameplayScreen(void)
    player_flashtimer = 0;
 
    enemy.currentframe = 0;
-   enemy.speed = 100.0f;
+   enemy.speed = 2.0f;
    enemy.hp = 30;
    enemy.hitbox = (Rectangle) {
      690,
@@ -114,10 +114,10 @@ void ResetGameplayScreen(void)
    };
 
    heart.hitbox = (Rectangle) {
-     GetRandomValue(0, GetScreenWidth() - heart_sprite.width),
-     GetRandomValue(0, GetScreenHeight() - heart_sprite.height),
-     (float) heart_sprite.width,
-     (float) heart_sprite.height
+     GetRandomValue(0, GetScreenWidth() - feather_sprite.width),
+     GetRandomValue(0, GetScreenHeight() - feather_sprite.height),
+     (float) feather_sprite.width,
+     (float) feather_sprite.height
    };
    heart.active = true;
 
@@ -216,9 +216,9 @@ void UpdateGameplayScreen(void)
 
          if (heart.active) {
              if (CheckCollisionRecs(player.hitbox,  heart.hitbox)) {
-                 player.hp = MAX_PLAYER_HP;
-                 heart.hitbox.x = GetRandomValue(0, GetScreenWidth() - heart_sprite.width);
-                 heart.hitbox.y = GetRandomValue(0, GetScreenHeight() - heart_sprite.height);
+                 player.hp++;
+                 heart.hitbox.x = GetRandomValue(0, GetScreenWidth() - feather_sprite.width);
+                 heart.hitbox.y = GetRandomValue(0, GetScreenHeight() - feather_sprite.height);
                  heart.active = false;
              }
          }
@@ -227,7 +227,7 @@ void UpdateGameplayScreen(void)
            score++;
            if (score >= bestscore)  bestscore = score;
 
-           enemy.hitbox.y += GetFrameTime() * enemy.speed;
+           enemy.hitbox.y += enemy.speed;
 
            if (((enemy.hitbox.y + enemy.hitbox.height) >= GetScreenHeight()
            || (enemy.hitbox.y <= 0))) enemy.speed *= -1.0f;
@@ -264,7 +264,7 @@ void DrawGameplayScreen(void)
   DrawFPS(10, 430);
   if (DebugMode) {
     DrawRectangleRec(player.hitbox, BLUE);
-    DrawRectangleRec(heart.hitbox, GREEN);
+    DrawRectangleRec(heart.hitbox, WHITE);
     DrawText(TextFormat("enemy.hitbox.y: %f", enemy.hitbox.y), 10, 200, 20, GREEN);
     DrawText(TextFormat("player.hitbox.y: %f", player.hitbox.y), 10, 230, 20, GREEN);
     DrawRectangleRec(enemy.hitbox, BLACK);
@@ -276,7 +276,7 @@ void DrawGameplayScreen(void)
     DrawText(TextFormat("player_iframeTimer: %d", player_iframeTimer), 10, 300, 20, GREEN);
     DrawText(TextFormat("player_in: %d", player_in), 10, 320, 20, GREEN);
   }
-  if (heart.active) DrawTexture(heart_sprite, heart.sprite_pos.x, heart.sprite_pos.y, RAYWHITE);
+  if (heart.active) DrawTexture(feather_sprite, heart.sprite_pos.x, heart.sprite_pos.y, GREEN);
   DrawTexture(enemy_sprite, enemy.sprite_pos.x, enemy.sprite_pos.y, enemy.color);
   for (int i = 0; i < MAX_FIREWORKS; i++) {
     DrawTexture(firework_sprite, fireworks[i].sprite_pos.x, fireworks[i].sprite_pos.y, fireworks[i].color);
@@ -291,7 +291,7 @@ void UnloadGameplayScreen()
 {
   UnloadSound(fxbounce);
   UnloadTexture(player_sprite);
-  UnloadTexture(heart_sprite);
+  UnloadTexture(feather_sprite);
   UnloadTexture(enemy_sprite);
   UnloadTexture(firework_sprite);
 }
