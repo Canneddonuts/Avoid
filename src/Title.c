@@ -17,15 +17,14 @@ int titleSelected = 0;
 
 void DrawScore(void)
 {
-  if (bestscore >= 10000) {
-     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, YELLOW);
-  } else if (bestscore >= 5000) {
-     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, DARKGRAY);
-  } else if (bestscore >= 1000) {
-     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, DARKBROWN);
-  } else {
+  if (bestscore >= 10000)
+     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, (Color){ 222, 181, 0, 255 });
+  else if (bestscore >= 5000)
+     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, (Color){ 149, 148, 147, 255 });
+  else if (bestscore >= 1000)
+     DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, (Color){ 138, 72, 4, 255 });
+  else
      DrawText(TextFormat("BEST: %i", bestscore), 600, 0, 30, BLUE);
-  }
 }
 
 void InitTitleScreen(void)
