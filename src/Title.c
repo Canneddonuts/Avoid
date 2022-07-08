@@ -55,6 +55,7 @@ void DrawTitleScreen(void)
   DrawText("Press 'Left-ALT' + 'F' for full screen", 10, 100, 10, WHITE);
   DrawText("Press 'R' to restart", 10, 120, 10, WHITE);
   DrawText("Press 'ENTER' or 'START' to select an option", 10, 140, 10, WHITE);
+  DrawText("Press 'X' or 'A' on a gamepad to shoot", 10, 160, 10, WHITE);
   DrawText("Avoid", 330, 20, 50, BLUE);
   if (titleSelected == 0) DrawText("PLAY", 360, 220, 20, WHITE);
   else DrawText("PLAY", 360, 220, 20, BLUE);

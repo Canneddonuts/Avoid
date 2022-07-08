@@ -14,5 +14,6 @@ extern Texture2D player_sprite;
 extern Texture2D feather_sprite;
 extern Texture2D enemy_sprite;
 extern Texture2D firework_sprite;
+extern Texture2D attack_sprite;
 
 #endif

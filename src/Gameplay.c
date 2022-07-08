@@ -34,7 +34,7 @@ void InitGameplayScreen(void)
   };
   player.hitbox = (Rectangle) {
     0,
-    50,
+    100,
     (float) player_sprite.width/3,
     (float) player_sprite.height/2 + 5
   };
@@ -57,19 +57,20 @@ void InitGameplayScreen(void)
 
   fxfeather = LoadSound("assets/sfx/feather.wav");
   feather_sprite = LoadTexture("assets/gfx/feather.png");
-  heart.hitbox = (Rectangle) {
+  feather.hitbox = (Rectangle) {
     GetRandomValue(0, GetScreenWidth() - feather_sprite.width),
     GetRandomValue(0, GetScreenHeight() - feather_sprite.height),
     (float) feather_sprite.width,
     (float) feather_sprite.height
   };
-  heart.active = true;
+  feather.active = true;
+  feather.power = 0;
+
 
   firework_sprite = LoadTexture("assets/gfx/firework.png");
   for (int i = 0; i < MAX_FIREWORKS; i++) {
-    fireworks[i].currentframe = 0;
-    fireworks[i].speed = 300.0f;
-    fireworks[i].hp = 0;
+    fireworks[i].speed.x = 300.0f;
+    fireworks[i].active = 0;
     fireworks[i].hitbox = (Rectangle) {
       630,
       GetRandomValue(0, GetScreenHeight()),
@@ -78,6 +79,22 @@ void InitGameplayScreen(void)
     };
     fireworks[i].color = RAYWHITE;
   }
+
+  attack_sprite = LoadTexture("assets/gfx/attack.png");
+  fxboom = LoadSound("assets/sfx/boom.wav");
+  for (int i = 0; i < MAX_SHOOTS; i++) {
+    shoot[i].hitbox = (Rectangle) {
+      player.hitbox.x,
+      player.hitbox.y,
+      (float) attack_sprite.width,
+      (float) attack_sprite.height
+    };
+    shoot[i].speed.x = 7;
+    shoot[i].speed.y = 0;
+    shoot[i].active = false;
+    shoot[i].color = RED;
+  }
+  ammo = 0;
 
   pause = 0;
   mute = false;
@@ -93,7 +110,7 @@ void ResetGameplayScreen(void)
    player.hp = PLAYER_HP;
    player.hitbox = (Rectangle) {
      0,
-     50,
+     100,
      (float) player_sprite.width/3,
      (float) player_sprite.height/2 + 5
    };
@@ -112,18 +129,18 @@ void ResetGameplayScreen(void)
      (float) enemy_sprite.height
    };
 
-   heart.hitbox = (Rectangle) {
+   feather.hitbox = (Rectangle) {
      GetRandomValue(0, GetScreenWidth() - feather_sprite.width),
      GetRandomValue(0, GetScreenHeight() - feather_sprite.height),
      (float) feather_sprite.width,
      (float) feather_sprite.height
    };
-   heart.active = true;
+   feather.active = true;
+   feather.power = 0;
 
    for (int i = 0; i < MAX_FIREWORKS; i++) {
-     fireworks[i].currentframe = 0;
-     fireworks[i].speed = 300.0f;
-     fireworks[i].hp = 0;
+     fireworks[i].speed.x = 300.0f;
+     fireworks[i].active = 0;
      fireworks[i].hitbox = (Rectangle) {
        630,
        GetRandomValue(0, GetScreenHeight()),
@@ -132,8 +149,21 @@ void ResetGameplayScreen(void)
      };
    }
 
-   DebugMode = 0;
+   for (int i = 0; i < MAX_SHOOTS; i++) {
+     shoot[i].hitbox = (Rectangle) {
+       player.hitbox.x,
+       player.hitbox.y,
+       (float) attack_sprite.width,
+       (float) attack_sprite.height
+     };
+     shoot[i].speed.x = 7;
+     shoot[i].speed.y = 0;
+     shoot[i].active = false;
+     shoot[i].color = RED;
+   }
+   ammo = 0;
 
+   DebugMode = 0;
    pauseTimer = 0;
    score = 0;
 }
@@ -178,11 +208,24 @@ void UpdateGameplayScreen(void)
          player.speed = 600.0f;
          if (player.currentframe != 1) player.currentframe = 2;
        } else player.speed = 300.0f;
+       if (INPUT_FIRE_PRESSED) {
+         if (ammo > 0) {
+           for (int i = 0; i < MAX_SHOOTS; i++) {
+             if (!shoot[i].active) {
+               ammo--;
+               shoot[i].hitbox.x = player.hitbox.x;
+               shoot[i].hitbox.y = player.hitbox.y + player.hitbox.height/4;
+               shoot[i].active = true;
+               break;
+             }
+           }
+         }
+       }
 
          player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
          player.frameRec.x = (float)player.currentframe*(float)player_sprite.width/3;
 
-         heart.sprite_pos = (Vector2){ heart.hitbox.x, heart.hitbox.y };
+         feather.sprite_pos = (Vector2){ feather.hitbox.x, feather.hitbox.y };
          enemy.sprite_pos = (Vector2){ enemy.hitbox.x, enemy.hitbox.y };
 
          player_flashtimer++;
@@ -191,7 +234,12 @@ void UpdateGameplayScreen(void)
            fireworks[i].sprite_pos = (Vector2){ fireworks[i].hitbox.x, fireworks[i].hitbox.y };
          }
 
-         if (score % 1000 == 0) heart.active = true;
+         for (int i = 0; i < MAX_SHOOTS; i++) {
+           shoot[i].sprite_pos = (Vector2){ shoot[i].hitbox.x, shoot[i].hitbox.y };
+         }
+
+
+         if (score % 1000 == 0) feather.active = true;
 
          // Player to da wallz collies
          if ((player.hitbox.x + player.hitbox.width) >= GetScreenWidth()) player.hitbox.x = GetScreenWidth() - player.hitbox.width;
@@ -203,6 +251,8 @@ void UpdateGameplayScreen(void)
          UpdateiFrameTimer();
 
          if (IsKeyPressed(KEY_D)) DebugMode = !DebugMode;
+         if (IsKeyPressed(KEY_NINE)) ammo = 99;
+         if (IsKeyPressed(KEY_ZERO)) ammo = 0;
 
          if (IsKeyPressed(KEY_R)) {
            gameReset();
@@ -214,13 +264,37 @@ void UpdateGameplayScreen(void)
            currentScreen = GAMEOVER;
          }
 
-         if (heart.active) {
-             if (CheckCollisionRecs(player.hitbox,  heart.hitbox)) {
-                 player.hp++;
+         for (int i = 0; i < MAX_SHOOTS; i++) {
+           if (shoot[i].active) {
+             shoot[i].hitbox.x += shoot[i].speed.x;
+           }
+
+           if (CheckCollisionRecs(shoot[i].hitbox, enemy.hitbox) && shoot[i].active) {
+            // enemy.hp--;
+             score += 300;
+             if (!mute) PlaySoundMulti(fxboom);
+             shoot[i].active = false;
+           }
+
+           if (shoot[i].hitbox.x + shoot[i].hitbox.width >= GetScreenWidth() + attack_sprite.width) {
+             shoot[i].active = false;
+           }
+         }
+
+         if (feather.active) {
+           switch (feather.power) {
+             case 0:  feather.color = GREEN; break;
+             case 1:  feather.color = RED; break;
+           }
+             if (CheckCollisionRecs(player.hitbox,  feather.hitbox)) {
+                 switch (feather.power) {
+                   case 0: player.hp++; feather.power = 1; break;
+                   case 1: ammo++; feather.power = 0; break;
+                 }
                  if (!mute) PlaySoundMulti(fxfeather);
-                 heart.hitbox.x = GetRandomValue(0, GetScreenWidth() - feather_sprite.width);
-                 heart.hitbox.y = GetRandomValue(0, GetScreenHeight() - feather_sprite.height);
-                 heart.active = false;
+                 feather.hitbox.x = GetRandomValue(0, GetScreenWidth() - feather_sprite.width);
+                 feather.hitbox.y = GetRandomValue(0, GetScreenHeight() - feather_sprite.height);
+                 feather.active = false;
              }
          }
 
@@ -240,23 +314,23 @@ void UpdateGameplayScreen(void)
          for (int i = 0; i < MAX_FIREWORKS; i++) {
            if (CheckCollisionRecs(player.hitbox, fireworks[i].hitbox)) {
              DamagePlayer();
-             fireworks[i].hp = 0;
+             fireworks[i].active = 0;
            }
 
-           switch (fireworks[i].hp) {
+           switch (fireworks[i].active) {
              case 0:
                  fireworks[i].hitbox.x = enemy.hitbox.x - 20;
                  fireworks[i].hitbox.y = enemy.hitbox.y - 20;
 
                  if (GetRandomValue(0, 50) == 50) {
-                   fireworks[i].hp = 1;
+                   fireworks[i].active = 1;
                    fireworks[i].hitbox.y += enemy.hitbox.height/2;
                  }
                  break;
              case 1:
-               fireworks[i].hitbox.x += GetFrameTime() * -fireworks[i].speed;
+               fireworks[i].hitbox.x += GetFrameTime() * -fireworks[i].speed.x;
                if (((fireworks[i].hitbox.x + -firework_sprite.width) > GetScreenWidth()
-               || (fireworks[i].hitbox.x <= -firework_sprite.width))) fireworks[i].hp = 0;
+               || (fireworks[i].hitbox.x <= -firework_sprite.width))) fireworks[i].active = 0;
                break;
            }
          }
@@ -271,26 +345,36 @@ void DrawGameplayScreen(void)
   DrawFPS(10, 430);
   if (DebugMode) {
     DrawRectangleRec(player.hitbox, BLUE);
-    DrawRectangleRec(heart.hitbox, WHITE);
+    DrawRectangleRec(feather.hitbox, WHITE);
     DrawText(TextFormat("enemy.hitbox.y: %f", enemy.hitbox.y), 10, 200, 20, GREEN);
     DrawText(TextFormat("player.hitbox.y: %f", player.hitbox.y), 10, 230, 20, GREEN);
     DrawRectangleRec(enemy.hitbox, BLACK);
     DrawText(TextFormat("firework_sprite.width: %d", firework_sprite.width), 10, 270, 20, GREEN);
     for (int i = 0; i < MAX_FIREWORKS; i++) {
-      DrawText(TextFormat("fireworks[i].hp: %d", fireworks[i].hp), 10, 250, 20, GREEN);
       DrawRectangleRec(fireworks[i].hitbox, BLACK);
+    }
+    for (int i = 0; i < MAX_SHOOTS; i++) {
+      DrawRectangleRec(shoot[i].hitbox, GREEN);
+      DrawText(TextFormat("ammo: %d", ammo), 10, 340, 20, GREEN);
     }
     DrawText(TextFormat("player_iframeTimer: %d", player_iframeTimer), 10, 300, 20, GREEN);
     DrawText(TextFormat("player_in: %d", player_in), 10, 320, 20, GREEN);
   }
-  if (heart.active) DrawTexture(feather_sprite, heart.sprite_pos.x, heart.sprite_pos.y, GREEN);
+  if (feather.active) DrawTexture(feather_sprite, feather.sprite_pos.x, feather.sprite_pos.y, feather.color);
   DrawTexture(enemy_sprite, enemy.sprite_pos.x, enemy.sprite_pos.y, enemy.color);
   for (int i = 0; i < MAX_FIREWORKS; i++) {
     DrawTexture(firework_sprite, fireworks[i].sprite_pos.x, fireworks[i].sprite_pos.y, fireworks[i].color);
   }
+  for (int i = 0; i < MAX_SHOOTS; i++) {
+    if (shoot[i].active) DrawTexture(attack_sprite, shoot[i].sprite_pos.x, shoot[i].sprite_pos.y, shoot[i].color);
+  }
   DrawTextureRec(player_sprite, player.frameRec, player.sprite_pos, player.color);
-  DrawText(TextFormat("HP: %i", player.hp), 10, 10, 20, RED);
-  DrawText(TextFormat("SCORE: %i", score), 10, 30, 20, BLUE);
+  DrawTexture(feather_sprite, 0, 0, GREEN);
+  DrawText(TextFormat("= %i", player.hp), 30, 30, 20, GREEN);
+  DrawTexture(feather_sprite, 70, 0, RED);
+  DrawText(TextFormat("= %i", ammo), 100, 30, 20, RED);
+//  DrawText(TextFormat("ENEMY HP: %i", enemy.hp), GetScreenWidth() - 150, 10, 20, RED);
+  DrawText(TextFormat("SCORE: %i", score), 10, 65, 20, BLUE);
   if (pause && ((pauseTimer/30)%2)) DrawText("PAUSED", 330, 190, 30, WHITE);
 }
 
@@ -298,10 +382,12 @@ void UnloadGameplayScreen()
 {
   UnloadSound(fxhit);
   UnloadSound(fxfeather);
+  UnloadSound(fxboom);
   UnloadTexture(player_sprite);
   UnloadTexture(feather_sprite);
   UnloadTexture(enemy_sprite);
   UnloadTexture(firework_sprite);
+  UnloadTexture(attack_sprite);
 }
 
 void gameReset(void)

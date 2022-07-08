@@ -2,8 +2,10 @@
 A dumb raylib test which you can play [here](https://canneddonuts.itch.io/avoid-the-game)
 
 ##  To-do
-- build guide/better Makefile
-- fix the dumb bug when the ball gets stuck
+- a build guide
+- multiple stages
+- an options menu
+- a tutorial
 
 ## Preview
-![Alt Text](./doc-assets/preview.gif)
+![Alt Text](./doc-assets/preview.png)

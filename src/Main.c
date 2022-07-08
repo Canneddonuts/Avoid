@@ -25,6 +25,7 @@ Texture2D player_sprite;
 Texture2D feather_sprite;
 Texture2D enemy_sprite;
 Texture2D firework_sprite;
+Texture2D attack_sprite;
 
 // Game functions
 static void gameSetup(void);
