@@ -25,7 +25,8 @@ void InitGameplayScreen(void);
 void UpdateGameplayScreen(void);
 void DrawGameplayScreen(void);
 void UnloadGameplayScreen(void);
-void ResetGameplayScreen(void);
+void LoadGamplayScreen(void);
+
 
 void UpdateCreditsScreen(void);
 void DrawCreditsScreen(void);

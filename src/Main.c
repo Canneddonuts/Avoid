@@ -64,6 +64,7 @@ void gameSetup(void)
   // asset loading & setting of variable values
    currentScreen = TITLE;
 
+   LoadGamplayScreen();
    InitGameplayScreen();
    InitTitleScreen();
 }
