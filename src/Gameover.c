@@ -11,11 +11,12 @@
 #include "Screens.h"
 #include "Controls.h"
 
-int gameoverSelected = 0;
+int gameoverSelected = 0, finishfromGameoverScreen = 0;
 
 void InitGameoverScreen(void)
 {
   gameoverSelected = 0;
+  finishfromGameoverScreen = 0;
 }
 
 void UpdateGameoverScreen(void)
@@ -26,10 +27,10 @@ void UpdateGameoverScreen(void)
   if (gameoverSelected < -1) gameoverSelected++;
 
   if ((gameoverSelected == 0) && (INPUT_OPTION_PRESSED))
-    currentScreen = GAMEPLAY;
+    finishfromGameoverScreen = 2;
 
   if ((gameoverSelected == -1) && (INPUT_OPTION_PRESSED))
-    currentScreen = TITLE;
+    finishfromGameoverScreen = 1;
 }
 
 void DrawGameoverScreen(void)
@@ -41,4 +42,14 @@ void DrawGameoverScreen(void)
 
   if (gameoverSelected == -1) DrawText("TITLE", 352, 230, 20, WHITE);
   else DrawText("TITLE", 352, 230, 20, RED);
+}
+
+int FinishGameoverScreen(void)
+{
+  return finishfromGameoverScreen;
+}
+
+void UnloadGameoverScreen(void)
+{
+
 }

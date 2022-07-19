@@ -381,7 +381,8 @@ PROJECT_SOURCE_FILES ?= \
     $(PROJECT_SOURCE_PATH)/Gameplay.c \
     $(PROJECT_SOURCE_PATH)/Title.c \
     $(PROJECT_SOURCE_PATH)/Credits.c \
-    $(PROJECT_SOURCE_PATH)/Gameover.c
+		$(PROJECT_SOURCE_PATH)/Gameover.c \
+		$(PROJECT_SOURCE_PATH)/Options.c
 
 # Define all object files from source files
 OBJS = $(patsubst %.c, %.o, $(PROJECT_SOURCE_FILES))

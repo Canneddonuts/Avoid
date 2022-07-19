@@ -10,12 +10,13 @@
 
 #include "Screens.h"
 #include "Controls.h"
+#include "Options.h"
 #include "Gameplay.h"
 #include "Score.h"
 #include "Timers.h"
 #include "Textures.h"
 
-int score = 0, bestscore = 0;
+int score = 0, bestscore = 0, finishfromGameplayScreen = 0;
 
 void LoadGamplayScreen(void)
 {
@@ -31,6 +32,8 @@ void LoadGamplayScreen(void)
 
 void InitGameplayScreen(void)
 {
+  finishfromGameplayScreen = 0;
+
   SetMasterVolume(0.5);
 
   player.currentframe = 0;
@@ -155,8 +158,6 @@ void UpdateiFrameTimer(void)
 
 void UpdateGameplayScreen(void)
 {
-   if (IsKeyPressed(KEY_M)) mute = !mute;
-
    if (INPUT_OPTION_PRESSED) pause = !pause;
 
    if (!pause) {
@@ -220,13 +221,11 @@ void UpdateGameplayScreen(void)
 
 
          if (IsKeyPressed(KEY_R)) {
-           gameReset();
-           currentScreen = TITLE;
+           finishfromGameplayScreen = 2;
          }
 
          if (player.hp <= 0) {
-           gameReset();
-           currentScreen = GAMEOVER;
+           finishfromGameplayScreen = 1;
          }
 
          for (int i = 0; i < MAX_SHOOTS; i++) {
@@ -357,8 +356,7 @@ void UnloadGameplayScreen()
   UnloadTexture(attack_sprite);
 }
 
-void gameReset(void)
+int FinishGameplayScreen(void)
 {
-   InitGameplayScreen();
-   InitGameoverScreen();
+  return finishfromGameplayScreen;
 }

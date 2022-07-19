@@ -12,9 +12,16 @@
 #include "Controls.h"
 #include "Textures.h"
 
+int finishfromCreditsScreen = 0;
+
+void InitCreditsScreen(void)
+{
+  finishfromCreditsScreen = 0;
+}
+
 void UpdateCreditsScreen(void)
 {
-  if (INPUT_OPTION_PRESSED) currentScreen = TITLE;
+  if (INPUT_OPTION_PRESSED) finishfromCreditsScreen = 1;
 }
 
 void DrawCreditsScreen(void)
@@ -26,4 +33,14 @@ void DrawCreditsScreen(void)
   DrawText("A Canneddonuts project 2022", 10, 270, 40, BLUE);
   DrawText(TextFormat("Build compiled on %s", __DATE__), 10, 310, 30, GREEN);
   DrawText("Press 'ENTER' ", 10, 350, 20, WHITE);
+}
+
+int FinishCreditsScreen(void)
+{
+  return finishfromCreditsScreen;
+}
+
+void UnloadCreditsScreen(void)
+{
+
 }

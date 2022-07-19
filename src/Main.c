@@ -9,6 +9,7 @@
 #include "../include/raylib.h"
 
 #include "Screens.h"
+#include "Options.h"
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
@@ -17,6 +18,12 @@
 // screen variables
 static const int screenWidth  = 800;
 static const int screenHeight = 450;
+
+static float transAlpha = 0.0f;
+static bool onTransition = false;
+static bool transFadeOut = false;
+static int transFromScreen = -1;
+static int transToScreen = -1;
 
 GameScreen currentScreen = 0;
 
@@ -29,10 +36,11 @@ Texture2D attack_sprite;
 
 // Game functions
 static void gameSetup(void);
-static void updateGame(void);
-static void drawGame(void);
-static void gameLoop(void);
+static void update_draw_frame(void);
 static void unloadGame(void);
+static void transition_to_screen(int screen);
+static void update_transition(void);
+static void draw_transition(void);
 
 int main(void)
 {
@@ -43,11 +51,11 @@ int main(void)
   gameSetup();
 
 #if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(gameLoop, 60, 1);
+    emscripten_set_main_loop(update_draw_frame, 60, 1);
 #else
     SetTargetFPS(60);
 
-    while (!WindowShouldClose()) gameLoop();
+    while (!WindowShouldClose()) update_draw_frame();
 #endif
 
   unloadGame();
@@ -63,52 +71,134 @@ void gameSetup(void)
 {
   // asset loading & setting of variable values
    currentScreen = TITLE;
-
-   LoadGamplayScreen();
-   InitGameplayScreen();
-   InitTitleScreen();
+   background = LoadTexture("assets/gfx/background.png");
 }
 
-void updateGame(void)
-{
-  // code that runs as long as the program is running
- if ((IsKeyDown(KEY_LEFT_ALT)) && (IsKeyPressed(KEY_F))) ToggleFullscreen();
 
-  switch (currentScreen) {
-    case TITLE:  UpdateTitleScreen(); break;
-    case GAMEPLAY: UpdateGameplayScreen(); break;
-    case GAMEOVER: UpdateGameoverScreen(); break;
-    case CREDITS: UpdateCreditsScreen(); break;
-    default: break;
+static void transition_to_screen(int screen)
+{
+  onTransition = true;
+  transFadeOut = false;
+  transFromScreen = currentScreen;
+  transToScreen = screen;
+  transAlpha = 0.0f;
+}
+
+static void update_transition(void)
+{
+  if (!transFadeOut) {
+    transAlpha += 0.05f;
+
+    if (transAlpha > 1.01f) {
+      transAlpha = 1.0f;
+
+      switch (transFromScreen) {
+        case TITLE: UnloadTitleScreen(); break;
+        case GAMEPLAY: UnloadGameplayScreen(); break;
+        case GAMEOVER: UnloadGameoverScreen(); break;
+        case CREDITS: UnloadCreditsScreen(); break;
+        case OPTIONS: UnloadOptionsScreen(); break;
+        default: break;
+      }
+
+      switch (transToScreen) {
+        case TITLE:  InitTitleScreen(); break;
+        case GAMEPLAY: LoadGamplayScreen(); InitGameplayScreen(); break;
+        case GAMEOVER: InitGameoverScreen(); break;
+        case CREDITS: InitCreditsScreen(); break;
+        case OPTIONS: InitOptionsScreen(); break;
+        default: break;
+      }
+
+      currentScreen = transToScreen;
+
+      transFadeOut = true;
+    }
+  } else {
+    transAlpha -= 0.02f;
+
+    if (transAlpha < -0.01f) {
+      transAlpha = 0.0f;
+      transFadeOut = false;
+      onTransition = false;
+      transFromScreen = -1;
+      transToScreen = -1;
+    }
   }
 }
 
-void drawGame(void)
+static void draw_transition(void)
 {
-  // code to render the game to the game window
+  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, transAlpha));
+}
+
+
+static void update_draw_frame(void)
+{
+  if (IsKeyPressed(KEY_M)) mute = !mute;
+  if ((IsKeyDown(KEY_LEFT_ALT)) && (IsKeyPressed(KEY_F))) { ToggleFullscreen(); fullscreen = !fullscreen; }
+
+  if (!onTransition) {
+    switch (currentScreen) {
+      case TITLE: {
+        UpdateTitleScreen();
+
+        if (FinishTitleScreen() == 1) transition_to_screen(CREDITS);
+        else if (FinishTitleScreen() == 2) transition_to_screen(GAMEPLAY);
+        else if (FinishTitleScreen() == 3) transition_to_screen(OPTIONS);
+      } break;
+      case CREDITS: {
+        UpdateCreditsScreen();
+
+        if (FinishCreditsScreen() == 1) transition_to_screen(TITLE);
+      } break;
+      case GAMEPLAY: {
+        UpdateGameplayScreen();
+
+        if (FinishGameplayScreen() == 1) transition_to_screen(GAMEOVER);
+        else if (FinishGameplayScreen() == 2) transition_to_screen(TITLE);
+      } break;
+      case GAMEOVER: {
+        UpdateGameoverScreen();
+
+        if (FinishGameoverScreen() == 1) transition_to_screen(TITLE);
+        else if (FinishGameoverScreen() == 2) transition_to_screen(GAMEPLAY);
+      } break;
+      case OPTIONS: {
+        UpdateOptionsScreen();
+
+        if (FinishOptionsScreen() == 1) transition_to_screen(TITLE);
+      } break;
+      default: break;
+    }
+  } else update_transition();
+
   BeginDrawing();
 
-      ClearBackground(RAYWHITE);
+     ClearBackground(RAYWHITE);
 
-      switch (currentScreen) {
-        case TITLE: DrawTitleScreen(); break;
-        case GAMEPLAY: DrawGameplayScreen(); break;
-        case GAMEOVER: DrawGameoverScreen(); break;
-        case CREDITS: DrawCreditsScreen(); break;
-        default: break;
-      }
+     switch (currentScreen) {
+       case TITLE: DrawTitleScreen(); break;
+       case CREDITS: DrawCreditsScreen(); break;
+       case GAMEPLAY: DrawGameplayScreen(); break;
+       case GAMEOVER: DrawGameoverScreen(); break;
+       case OPTIONS: DrawOptionsScreen(); break;
+       default: break;
+     }
+
+     if (onTransition) draw_transition();
 
   EndDrawing();
 }
 
-void gameLoop(void)
+static void unloadGame(void)
 {
-  updateGame();
-  drawGame();
-}
-
-void unloadGame(void)
-{
-  UnloadGameplayScreen();
-  UnloadTitleScreen();
+    switch (currentScreen) {
+      case TITLE: UnloadTitleScreen(); break;
+      case GAMEPLAY: UnloadGameplayScreen(); break;
+      case GAMEOVER: UnloadGameoverScreen(); break;
+      case CREDITS: UnloadCreditsScreen(); break;
+      case OPTIONS: UnloadOptionsScreen(); break;
+      default: break;
+    }
 }
