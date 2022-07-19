@@ -13,7 +13,7 @@
 #include "Controls.h"
 #include "Options.h"
 
-int optionsSelected = 0, finishfromOptionsScreen = 0;
+int optionsSelected = 0, finishfromOptionsScreen = 0, mute = 0, fullscreen = 0;
 
 void InitOptionsScreen(void)
 {

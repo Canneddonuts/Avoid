@@ -9,7 +9,7 @@
 #ifndef OPTIONS_HEADER
 #define OPTIONS_HEADER
 
-bool mute;
-bool fullscreen;
+extern int mute;
+extern int fullscreen;
 
 #endif
