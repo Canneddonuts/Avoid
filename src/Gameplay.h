@@ -9,6 +9,8 @@
 #ifndef GAMEPLAY_HEADER
 #define GAMEPLAY_HEADER
 
+typedef enum Levels { LEVEL1 = 0, LEVEL2, LEVEL3 } Levels;
+
 #define MAX_FIREWORKS 10
 #define PLAYER_HP 3
 #define MAX_SHOOTS 3
@@ -52,6 +54,7 @@ bool player_in;
 bool enemy_hurt;
 int ammo = 0;
 int GI_callcount = 0;
+
 
 
 bool DebugMode;

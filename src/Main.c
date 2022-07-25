@@ -143,9 +143,11 @@ static void update_draw_frame(void)
       case TITLE: {
         UpdateTitleScreen();
 
-        if (FinishTitleScreen() == 1) transition_to_screen(CREDITS);
-        else if (FinishTitleScreen() == 2) transition_to_screen(GAMEPLAY);
-        else if (FinishTitleScreen() == 3) transition_to_screen(OPTIONS);
+        switch (FinishTitleScreen()) {
+          case 1: transition_to_screen(CREDITS); break;
+          case 2: transition_to_screen(GAMEPLAY); break;
+          case 3: transition_to_screen(OPTIONS); break;
+        }
       } break;
       case CREDITS: {
         UpdateCreditsScreen();
@@ -201,4 +203,6 @@ static void unloadGame(void)
       case OPTIONS: UnloadOptionsScreen(); break;
       default: break;
     }
+
+    UnloadTexture(background);
 }
