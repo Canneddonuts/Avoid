@@ -51,12 +51,9 @@ Sound fxfeather = { 0 };
 Sound fxboom = { 0 };
 bool pause;
 bool player_in;
+bool DebugMode;
 bool enemy_hurt;
 int ammo = 0;
 int GI_callcount = 0;
-
-
-
-bool DebugMode;
 
 #endif
