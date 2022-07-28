@@ -11,8 +11,7 @@
 
 int pauseTimer;
 int player_iframeTimer;
-int player_flashtimer;
 int enemy_iframetimer;
-int enemy_flashtimer;
+int globalTimer;
 
 #endif

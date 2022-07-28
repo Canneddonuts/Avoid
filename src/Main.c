@@ -72,6 +72,8 @@ void gameSetup(void)
   // asset loading & setting of variable values
    currentScreen = TITLE;
    background = LoadTexture("assets/gfx/background.png");
+
+   SetMasterVolume(0.5);
 }
 
 
@@ -98,6 +100,7 @@ static void update_transition(void)
         case GAMEOVER: UnloadGameoverScreen(); break;
         case CREDITS: UnloadCreditsScreen(); break;
         case OPTIONS: UnloadOptionsScreen(); break;
+        case ENDING: UnloadEndingScreen(); break;
         default: break;
       }
 
@@ -107,6 +110,7 @@ static void update_transition(void)
         case GAMEOVER: InitGameoverScreen(); break;
         case CREDITS: InitCreditsScreen(); break;
         case OPTIONS: InitOptionsScreen(); break;
+        case ENDING: InitEndingScreen(); break;
         default: break;
       }
 
@@ -157,8 +161,11 @@ static void update_draw_frame(void)
       case GAMEPLAY: {
         UpdateGameplayScreen();
 
-        if (FinishGameplayScreen() == 1) transition_to_screen(GAMEOVER);
-        else if (FinishGameplayScreen() == 2) transition_to_screen(TITLE);
+        switch (FinishGameplayScreen()) {
+          case 1: transition_to_screen(GAMEOVER); break;
+          case 2: transition_to_screen(TITLE); break;
+          case 3: transition_to_screen(ENDING); break;
+        }
       } break;
       case GAMEOVER: {
         UpdateGameoverScreen();
@@ -170,6 +177,9 @@ static void update_draw_frame(void)
         UpdateOptionsScreen();
 
         if (FinishOptionsScreen() == 1) transition_to_screen(TITLE);
+      } break;
+      case ENDING: {
+        UpdateEndingScreen();
       } break;
       default: break;
     }
@@ -185,6 +195,7 @@ static void update_draw_frame(void)
        case GAMEPLAY: DrawGameplayScreen(); break;
        case GAMEOVER: DrawGameoverScreen(); break;
        case OPTIONS: DrawOptionsScreen(); break;
+       case ENDING: DrawEndingScreen(); break;
        default: break;
      }
 
@@ -201,6 +212,7 @@ static void unloadGame(void)
       case GAMEOVER: UnloadGameoverScreen(); break;
       case CREDITS: UnloadCreditsScreen(); break;
       case OPTIONS: UnloadOptionsScreen(); break;
+      case ENDING: UnloadEndingScreen(); break;
       default: break;
     }
 

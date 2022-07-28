@@ -3,7 +3,6 @@ A dumb raylib test which you can play [here](https://canneddonuts.itch.io/avoid-
 
 ##  To-do
 - a build guide
-- multiple stages
 - a tutorial
 
 ## Note
@@ -11,3 +10,5 @@ This games code more specifically 'Main.c' is a retyped version of this [repo](h
 
 ## Preview
 ![Alt Text](./doc-assets/preview.png)
+![Alt Text](./doc-assets/preview1.png)
+![Alt Text](./doc-assets/preview2.png)

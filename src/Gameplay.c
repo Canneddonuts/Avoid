@@ -24,7 +24,7 @@ void SetEnemyLevel(void)
   switch (level) {
     case LEVEL1: enemy.speed *= 1.0f; break;
     case LEVEL2: enemy.speed *= 2.0f; break;
-    case LEVEL3: enemy.speed *= 3.0f; break;
+    case LEVEL3: enemy.speed *= 2.0f; break;
   }
 }
 
@@ -46,7 +46,7 @@ void InitGameplayScreen(void)
 
   level = LEVEL1;
 
-  SetMasterVolume(0.5);
+  globalTimer = 0;
 
   player.currentframe = 0;
   player.speed = 300.0f;
@@ -68,7 +68,6 @@ void InitGameplayScreen(void)
   player_iframeTimer = 0;
   player_in = false;
   player.color = RAYWHITE;
-  player_flashtimer = 0;
 
   enemy.currentframe = 0;
   enemy.hp = 5;
@@ -90,7 +89,6 @@ void InitGameplayScreen(void)
   enemy.color = RAYWHITE;
   enemy_hurt = false;
   enemy_iframetimer = 0;
-  enemy_flashtimer = 0;
 
   feather.hitbox = (Rectangle) {
     GetRandomValue(0, GetScreenWidth() - feather_sprite.width),
@@ -148,13 +146,12 @@ void DamagePlayer(void)
 void UpdateTimers(void)
 {
   score++;
-  player_flashtimer++;
-  enemy_flashtimer++;
+  globalTimer++;
 
   if (player_in) {
     player_iframeTimer++;
     player.currentframe = 1;
-    if (player_flashtimer % 2 == 0) player.color = BLANK;
+    if (globalTimer % 2 == 0) player.color = BLANK;
     else player.color = RAYWHITE;
     if (player_iframeTimer >= 60) {
       player_in = false;
@@ -165,7 +162,7 @@ void UpdateTimers(void)
   if (enemy_hurt) {
     enemy_iframetimer++;
     enemy.currentframe = 1;
-    if (enemy_flashtimer % 2 == 0) enemy.color = BLANK;
+    if (globalTimer % 2 == 0) enemy.color = BLANK;
     else enemy.color = RAYWHITE;
     if (enemy_iframetimer >= 60) {
       enemy_hurt = false;
@@ -177,6 +174,8 @@ void UpdateTimers(void)
 void UpdateGameplayScreen(void)
 {
    if (INPUT_OPTION_PRESSED) pause = !pause;
+
+   if (level > 2) finishfromGameplayScreen = 3;
 
    if (!pause) {
 
@@ -230,6 +229,7 @@ void UpdateGameplayScreen(void)
          if (IsKeyPressed(KEY_NINE)) ammo = 99;
          if (IsKeyPressed(KEY_ZERO)) ammo = 0;
          if (IsKeyPressed(KEY_R)) finishfromGameplayScreen = 2;
+         if (IsKeyPressed(KEY_W)) finishfromGameplayScreen = 3;
 
          if (player.hp <= 0) finishfromGameplayScreen = 1;
 
@@ -258,8 +258,8 @@ void UpdateGameplayScreen(void)
                    case 0: player.hp++; feather.power = 1; break;
                    case 1: ammo++; if (player.hp < 5) feather.power = 0; else feather.power = 1; break;
                  }
-                 if (!mute) PlaySoundMulti(fxfeather);
-                 feather.hitbox.x = GetRandomValue(0, GetScreenWidth() - feather_sprite.width);
+                 if (!mute && player.hp < 5) PlaySoundMulti(fxfeather);
+                 feather.hitbox.x = GetRandomValue(0, 600);
                  feather.hitbox.y = GetRandomValue(0, GetScreenHeight() - feather_sprite.height);
              }
 
@@ -298,7 +298,7 @@ void UpdateGameplayScreen(void)
            switch (level) {
              case LEVEL1: fireworks[i].speed.x = 300.0f; break;
              case LEVEL2: fireworks[i].speed.x = 600.0f; break;
-             case LEVEL3: fireworks[i].speed.x = 1200.0f; break;
+             case LEVEL3: fireworks[i].speed.x = 900.0f; break;
            }
          }
        } else pauseTimer++;
@@ -308,7 +308,7 @@ void DrawGameplayScreen(void)
 {
   switch (level) {
     case LEVEL1: DrawTexture(background, 0, 0, RAYWHITE); break;
-    case LEVEL2: DrawTexture(background, 0, 0, BLUE); break;
+    case LEVEL2: DrawTexture(background, 0, 0, ORANGE); break;
     case LEVEL3: DrawTexture(background, 0, 0, RED); break;
   }
   DrawFPS(10, 430);
@@ -324,11 +324,10 @@ void DrawGameplayScreen(void)
     }
     DrawText(TextFormat("enemy.hitbox.y: %f", enemy.hitbox.y), 10, 200, 20, GREEN);
     DrawText(TextFormat("enemy.speed: %f", enemy.speed), 10, 220, 20, GREEN);
-    DrawText(TextFormat("enemy_flashtimer: %i", enemy_flashtimer), 10, 240, 20, GREEN);
+    DrawText(TextFormat("globalTimer: %i", globalTimer), 10, 240, 20, GREEN);
     DrawText(TextFormat("firework_sprite.width: %d", firework_sprite.width), 10, 260, 20, GREEN);
     DrawText(TextFormat("player_iframeTimer: %d", player_iframeTimer), 10, 280, 20, GREEN);
-    DrawText(TextFormat("player_flashtimer: %d", player_flashtimer), 10, 300, 20, GREEN);
-    DrawText(TextFormat("player_in: %d", player_in), 10, 320, 20, GREEN);
+    DrawText(TextFormat("player_in: %d", player_in), 10, 300, 20, GREEN);
   }
   if (feather.active) DrawTexture(feather_sprite, feather.sprite_pos.x, feather.sprite_pos.y, feather.color);
   DrawTextureRec(enemy_sprite, enemy.frameRec, enemy.sprite_pos, enemy.color);
