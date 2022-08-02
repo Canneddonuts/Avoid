@@ -19,10 +19,12 @@ struct Actor {
     float speed;
     int hp;
     int currentframe;
+    int iframetimer;
     Vector2 sprite_pos;
     Rectangle frameRec;
     Rectangle hitbox;
     Color color;
+    bool in;
 };
 
 struct Item {
@@ -50,9 +52,7 @@ Sound fxhit = { 0 };
 Sound fxfeather = { 0 };
 Sound fxboom = { 0 };
 bool pause;
-bool player_in;
 bool DebugMode;
-bool enemy_hurt;
 int ammo = 0;
 int GI_callcount = 0;
 

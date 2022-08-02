@@ -10,8 +10,6 @@
 #define TIMERS_HEADER
 
 int pauseTimer;
-int player_iframeTimer;
-int enemy_iframetimer;
 int globalTimer;
 
 #endif

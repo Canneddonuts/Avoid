@@ -180,6 +180,8 @@ static void update_draw_frame(void)
       } break;
       case ENDING: {
         UpdateEndingScreen();
+
+        if (FinishEndingScreen() == 1) transition_to_screen(TITLE);
       } break;
       default: break;
     }
