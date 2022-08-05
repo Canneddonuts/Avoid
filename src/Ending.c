@@ -9,7 +9,7 @@
 #include "../include/raylib.h"
 
 #include "Screens.h"
-#include "Textures.h"
+#include "Gfx.h"
 #include "Controls.h"
 
 int finishfromEndingScreen = 0;
@@ -27,9 +27,9 @@ void UpdateEndingScreen(void)
 void DrawEndingScreen(void)
 {
   DrawTexture(background, 0, 0, GOLD);
-  DrawText("THANK YOU SO MUCH FOR PLAYING!!!", 145, 20, 30, GOLD);
-  DrawText("Canneddonuts 2022", 500, 420, 30, WHITE);
-  DrawText("Press 'ENTER'", 0, 420, 30, WHITE);
+  DrawTextEx(ZadoBold, "THANK YOU SO MUCH FOR PLAYING!!!", (Vector2){ 10, 10 }, 45, 2, GOLD);
+  DrawTextEx(ZadoBold, "Canneddonuts 2022", (Vector2){ 380, 400 }, 40, 2, WHITE);
+  DrawTextEx(ZadoBold, "Press 'ENTER'", (Vector2){ 0, 400 }, 40, 2, WHITE);
 }
 
 void UnloadEndingScreen(void)

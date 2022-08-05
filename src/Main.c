@@ -33,6 +33,7 @@ Texture2D feather_sprite;
 Texture2D enemy_sprite;
 Texture2D firework_sprite;
 Texture2D attack_sprite;
+Font ZadoBold;
 
 // Game functions
 static void gameSetup(void);
@@ -72,6 +73,7 @@ void gameSetup(void)
   // asset loading & setting of variable values
    currentScreen = TITLE;
    background = LoadTexture("assets/gfx/background.png");
+   ZadoBold = LoadFontEx("assets/fonts/ZadoBold.ttf", 96, 0, 110);
 
    SetMasterVolume(0.5);
 }
@@ -218,5 +220,6 @@ static void unloadGame(void)
       default: break;
     }
 
+    UnloadFont(ZadoBold);
     UnloadTexture(background);
 }

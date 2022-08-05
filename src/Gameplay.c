@@ -14,7 +14,7 @@
 #include "Gameplay.h"
 #include "Score.h"
 #include "Timers.h"
-#include "Textures.h"
+#include "Gfx.h"
 
 int score = 0, bestscore = 0, finishfromGameplayScreen = 0;
 Levels level = 0;
@@ -339,9 +339,9 @@ void DrawGameplayScreen(void)
   }
   DrawTextureRec(player_sprite, player.frameRec, player.sprite_pos, player.color);
   DrawTexture(feather_sprite, 0, 0, GREEN);
-  DrawText(TextFormat("= %i", player.hp), 30, 30, 20, GREEN);
+  DrawTextEx(ZadoBold, TextFormat("= %i", player.hp), (Vector2){ 30, 30 }, 20, 2, GREEN);
   DrawTexture(feather_sprite, 70, 0, RED);
-  DrawText(TextFormat("= %i", ammo), 100, 30, 20, RED);
+  DrawTextEx(ZadoBold, TextFormat("= %i", ammo), (Vector2){ 100, 30 }, 20, 2, RED);
   DrawText(TextFormat("ENEMY HP: %i", enemy.hp), GetScreenWidth() - 150, 10, 20, RED);
   if (score >= 10000) DrawText(TextFormat("SCORE: %i", score), 10, 65, 20, (Color){ 222, 181, 0, 255 });
   else DrawText(TextFormat("SCORE: %i", score), 10, 65, 20, BLUE);

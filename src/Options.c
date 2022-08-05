@@ -9,7 +9,7 @@
 #include "../include/raylib.h"
 
 #include "Screens.h"
-#include "Textures.h"
+#include "Gfx.h"
 #include "Controls.h"
 #include "Options.h"
 

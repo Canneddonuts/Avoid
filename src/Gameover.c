@@ -9,6 +9,7 @@
 #include "../include/raylib.h"
 
 #include "Screens.h"
+#include "Gfx.h"
 #include "Controls.h"
 
 int gameoverSelected = 0, finishfromGameoverScreen = 0;
@@ -36,12 +37,12 @@ void UpdateGameoverScreen(void)
 void DrawGameoverScreen(void)
 {
   DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
-  DrawText("GAMEOVER", 250, 20, 50, RED);
-  if (gameoverSelected == 0) DrawText("RETRY", 350, 200, 20, WHITE);
-  else DrawText("RETRY", 350, 200, 20, RED);
+  DrawTextEx(ZadoBold, "GAMEOVER", (Vector2){ 220, 20 }, 80, 3, RED);
+  if (gameoverSelected == 0) DrawTextEx(ZadoBold, "RETRY", (Vector2){ 350, 200 }, 30, 2, WHITE);
+  else DrawTextEx(ZadoBold, "RETRY", (Vector2){ 350, 200 }, 30, 2, RED);
 
-  if (gameoverSelected == -1) DrawText("TITLE", 352, 230, 20, WHITE);
-  else DrawText("TITLE", 352, 230, 20, RED);
+  if (gameoverSelected == -1) DrawTextEx(ZadoBold, "TITLE", (Vector2){ 355, 230 }, 30, 2, WHITE);
+  else DrawTextEx(ZadoBold, "TITLE", (Vector2){ 355, 230 }, 30, 2, RED);
 }
 
 int FinishGameoverScreen(void)
