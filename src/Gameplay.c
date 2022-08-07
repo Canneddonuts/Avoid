@@ -14,10 +14,13 @@
 #include "Gameplay.h"
 #include "Score.h"
 #include "Timers.h"
+#include "Music.h"
 #include "Gfx.h"
 
 int score = 0, bestscore = 0, finishfromGameplayScreen = 0;
 Levels level = 0;
+
+Music music = { 0 };
 
 void SetEnemyLevel(void)
 {
@@ -38,6 +41,8 @@ void LoadGamplayScreen(void)
   attack_sprite = LoadTexture("assets/gfx/attack.png");
   firework_sprite = LoadTexture("assets/gfx/firework.png");
   fxboom = LoadSound("assets/sfx/boom.wav");
+  music = LoadMusicStream("assets/bgm/03-Boss.ogg");
+  PlayMusicStream(music);
 }
 
 void InitGameplayScreen(void)
@@ -162,7 +167,9 @@ void UpdateGameplayScreen(void)
 {
    if (INPUT_OPTION_PRESSED) pause = !pause;
    // code to end the game
-   if (level > 2) finishfromGameplayScreen = 3;
+   if (level > 2) { StopMusicStream(music); finishfromGameplayScreen = 3; }
+
+   if (!mute) UpdateMusicStream(music);
 
    if (!pause) {
 
@@ -226,7 +233,7 @@ void UpdateGameplayScreen(void)
          if (IsKeyPressed(KEY_W)) finishfromGameplayScreen = 3;
 
          // call gameover when killed
-         if (player.hp <= 0) finishfromGameplayScreen = 1;
+         if (player.hp <= 0) { StopMusicStream(music); finishfromGameplayScreen = 1; }
 
          // Red feather logic
          for (int i = 0; i < MAX_SHOOTS; i++) {
@@ -339,13 +346,13 @@ void DrawGameplayScreen(void)
   }
   DrawTextureRec(player_sprite, player.frameRec, player.sprite_pos, player.color);
   DrawTexture(feather_sprite, 0, 0, GREEN);
-  DrawTextEx(ZadoBold, TextFormat("= %i", player.hp), (Vector2){ 30, 30 }, 20, 2, GREEN);
-  DrawTexture(feather_sprite, 70, 0, RED);
-  DrawTextEx(ZadoBold, TextFormat("= %i", ammo), (Vector2){ 100, 30 }, 20, 2, RED);
-  DrawText(TextFormat("ENEMY HP: %i", enemy.hp), GetScreenWidth() - 150, 10, 20, RED);
-  if (score >= 10000) DrawText(TextFormat("SCORE: %i", score), 10, 65, 20, (Color){ 222, 181, 0, 255 });
-  else DrawText(TextFormat("SCORE: %i", score), 10, 65, 20, BLUE);
-  if (pause && ((pauseTimer/30)%2)) DrawText("PAUSED", 330, 190, 30, WHITE);
+  DrawTextEx(ZadoBold, TextFormat("= %i", player.hp), (Vector2){ 30, 30 }, 30, 2, GREEN);
+  DrawTexture(feather_sprite, 80, 0, RED);
+  DrawTextEx(ZadoBold, TextFormat("= %i", ammo), (Vector2){ 110, 30 }, 30, 2, RED);
+  DrawTextEx(ZadoBold, TextFormat("ENEMY HP: %i", enemy.hp), (Vector2){ GetScreenWidth() - 200, 0 }, 30, 2, RED);
+  if (score >= 10000) DrawTextEx(ZadoBold, TextFormat("SCORE: %i", score), (Vector2){ 10, 65 }, 30, 2, (Color){ 222, 181, 0, 255 });
+  else DrawTextEx(ZadoBold, TextFormat("SCORE: %i", score), (Vector2){ 10, 65 }, 30, 2, BLUE);
+  if (pause && ((pauseTimer/30)%2)) DrawTextEx(ZadoBold, "PAUSED", (Vector2){ 290, 160 }, 60, 2, WHITE);
 }
 
 void UnloadGameplayScreen()
@@ -358,6 +365,7 @@ void UnloadGameplayScreen()
   UnloadTexture(enemy_sprite);
   UnloadTexture(firework_sprite);
   UnloadTexture(attack_sprite);
+  UnloadMusicStream(music);
 }
 
 int FinishGameplayScreen(void)

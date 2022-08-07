@@ -36,24 +36,24 @@ void UpdateOptionsScreen(void)
 void DrawOptionsScreen(void)
 {
   DrawTexture(background, 0, 0, DARKGRAY);
-  DrawText("OPTIONS", 300, 20, 50, BLUE);
-  if (optionsSelected == 0) DrawText("Back", 20, 200, 20, WHITE);
-  else DrawText("Back", 20, 200, 20, BLUE);
+  DrawTextEx(ZadoBold, "OPTIONS", (Vector2){ 300, 20 }, 50, 2, BLUE);
+  if (optionsSelected == 0) DrawTextEx(ZadoBold, "Back", (Vector2){ 20, 170 }, 40, 2, WHITE);
+  else DrawTextEx(ZadoBold, "Back", (Vector2){ 20, 170 }, 40, 2, BLUE);
   if (optionsSelected == -1) {
-    DrawText("Mute", 20, 220, 20, WHITE);
-    DrawText(TextFormat("<%i>", mute), 200, 220, 20, WHITE);
+    DrawTextEx(ZadoBold, "Mute", (Vector2) { 20, 220 }, 40, 2, WHITE);
+    DrawTextEx(ZadoBold, TextFormat("<%i>", mute), (Vector2){ 250, 220 }, 40, 2, WHITE);
   }
   else {
-    DrawText("Mute", 20, 220, 20, BLUE);
-    DrawText(TextFormat("<%i>", mute), 200, 220, 20, BLUE);
+    DrawTextEx(ZadoBold, "Mute", (Vector2) { 20, 220 }, 40, 2, BLUE);
+    DrawTextEx(ZadoBold, TextFormat("<%i>", mute), (Vector2){ 250, 220 }, 40, 2, BLUE);
   }
   if (optionsSelected == -2) {
-    DrawText("Fullscreen", 20, 240, 20, WHITE);
-    DrawText(TextFormat("<%i>", fullscreen), 200, 240, 20, WHITE);
+    DrawTextEx(ZadoBold, "Fullscreen", (Vector2){ 20, 270 }, 40, 2, WHITE);
+    DrawTextEx(ZadoBold, TextFormat("<%i>", fullscreen), (Vector2){ 250, 270 }, 40, 2, WHITE);
   }
   else {
-    DrawText("Fullscreen", 20, 240, 20, BLUE);
-    DrawText(TextFormat("<%i>", fullscreen), 200, 240, 20, BLUE);
+    DrawTextEx(ZadoBold, "Fullscreen", (Vector2){ 20, 270 }, 40, 2, BLUE);
+    DrawTextEx(ZadoBold, TextFormat("<%i>", fullscreen), (Vector2){ 250, 270 }, 40, 2, BLUE);
   }
 }
 
