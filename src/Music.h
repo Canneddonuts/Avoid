@@ -11,6 +11,6 @@
 
 extern Music Endingsong;
 extern Music Gameoversong;
-extern Music music;
+extern Music Gameplaysong;
 
 #endif

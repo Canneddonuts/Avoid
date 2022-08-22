@@ -19,7 +19,7 @@ struct Actor {
     float speed;
     int hp;
     int currentframe;
-    int iframetimer;
+    float iframetimer;
     Vector2 sprite_pos;
     Rectangle frameRec;
     Rectangle hitbox;
@@ -46,13 +46,15 @@ struct Attack {
 struct Actor player = { 0 };
 struct Actor enemy = { 0 };
 struct Attack fireworks[MAX_FIREWORKS] = { 0 };
-struct Item feather = { 0 };
 struct Attack shoot[MAX_SHOOTS] = { 0 };
+struct Item feather = { 0 };
+Rectangle EnemyBounds[2] = { 0 };
 Sound fxhit = { 0 };
 Sound fxfeather = { 0 };
 Sound fxboom = { 0 };
 bool pause;
 bool DebugMode;
+bool ewc;
 int ammo = 0;
 int GI_callcount = 0;
 

@@ -9,7 +9,8 @@
 #ifndef TIMERS_HEADER
 #define TIMERS_HEADER
 
-int pauseTimer;
-int globalTimer;
+float pauseTimer;
+float globalTimer;
+float scoreTimer;
 
 #endif

@@ -45,6 +45,7 @@ static void draw_transition(void);
 
 int main(void)
 {
+  SetConfigFlags(FLAG_VSYNC_HINT);
   InitWindow(screenWidth, screenHeight, "Avoid");
 
   InitAudioDevice();
@@ -91,10 +92,10 @@ static void transition_to_screen(int screen)
 static void update_transition(void)
 {
   if (!transFadeOut) {
-    transAlpha += 0.05f;
+    transAlpha += GetFrameTime();
 
-    if (transAlpha > 1.01f) {
-      transAlpha = 1.0f;
+    if (transAlpha > 0.76f) {
+      transAlpha = 0.75f;
 
       switch (transFromScreen) {
         case TITLE: UnloadTitleScreen(); break;
@@ -121,9 +122,9 @@ static void update_transition(void)
       transFadeOut = true;
     }
   } else {
-    transAlpha -= 0.02f;
+    transAlpha -= GetFrameTime();
 
-    if (transAlpha < -0.01f) {
+    if (transAlpha < -0.75f) {
       transAlpha = 0.0f;
       transFadeOut = false;
       onTransition = false;
@@ -143,6 +144,8 @@ static void update_draw_frame(void)
 {
   if (IsKeyPressed(KEY_M)) mute = !mute;
   if ((IsKeyDown(KEY_LEFT_ALT)) && (IsKeyPressed(KEY_F))) { ToggleFullscreen(); fullscreen = !fullscreen; }
+//  printf("%f\n", GetFrameTime());
+//  printf("%f\n", transAlpha);
 
   if (!onTransition) {
     switch (currentScreen) {
@@ -202,6 +205,8 @@ static void update_draw_frame(void)
        case ENDING: DrawEndingScreen(); break;
        default: break;
      }
+
+    // DrawText(TextFormat("GetTime(): %f", GetTime()), 10, 320, 20, GREEN);
 
      if (onTransition) draw_transition();
 
