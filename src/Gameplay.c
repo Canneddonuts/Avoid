@@ -19,7 +19,6 @@
 
 int score = 0, bestscore = 0, finishfromGameplayScreen = 0;
 Levels level = 0;
-float var = 0.0f;
 
 Music Gameplaysong = { 0 };
 
@@ -54,7 +53,6 @@ void InitGameplayScreen(void)
   level = LEVEL1;
 
   globalTimer = 0;
-  var = 0.0f;
 
   player.currentframe = 0;
   player.speed = 300.0f;
@@ -237,7 +235,6 @@ void UpdateGameplayScreen(void)
          scoreTimer += 60 * GetFrameTime();
          score = (int)scoreTimer;
          globalTimer += 10 * GetFrameTime();
-      //   var -= GetFrameTime();
          // pass the address of each struct to the UpdateiFrameTimer function
          UpdateiFrameTimer(&player);
          UpdateiFrameTimer(&enemy);
@@ -311,9 +308,12 @@ void UpdateGameplayScreen(void)
 
                     if ((int)globalTimer % 10 == 0) {
                       fireworks[i].active = 1;
-                      fireworks[i].speed.x = GetRandomValue(300, 900);
                       fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
-              //        fireworks[i].hitbox.y += enemy.hitbox.height/2;
+                      switch (level) {
+                        case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
+                        case LEVEL2: fireworks[i].speed.x = GetRandomValue(300, 900); break;
+                        case LEVEL3: fireworks[i].speed.x = GetRandomValue(900, 1200); break;
+                      }
                     }
                   break;
               case 1:
@@ -323,11 +323,6 @@ void UpdateGameplayScreen(void)
                 || (fireworks[i].hitbox.x <= -firework_sprite.width))) fireworks[i].active = 0;
                 break;
             }
-      /*     switch (level) {
-             case LEVEL1: fireworks[i].speed.x = 300.0f; break;
-             case LEVEL2: fireworks[i].speed.x = 600.0f; break;
-             case LEVEL3: fireworks[i].speed.x = 900.0f; break;
-           }*/
          }
        } else pauseTimer += 60 * GetFrameTime();
 }
