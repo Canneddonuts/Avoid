@@ -97,7 +97,7 @@ void InitGameplayScreen(void)
   enemy.in = false;
   enemy.iframetimer = 0;
 
-  for (int i = 0; i < 2; i++) {
+/*  for (int i = 0; i < 2; i++) {
     EnemyBounds[i] = (Rectangle) {
        0,
        0,
@@ -105,15 +105,15 @@ void InitGameplayScreen(void)
        10
     };
   }
-  EnemyBounds[1].y = GetScreenHeight() - EnemyBounds[1].height;
+  EnemyBounds[1].y = GetScreenHeight() - EnemyBounds[1].height;*/
 
   feather.hitbox = (Rectangle) {
-    GetRandomValue(0, 600),
+    GetScreenWidth() - feather_sprite.width,
     GetRandomValue(0, GetScreenHeight() - feather_sprite.height),
     (float) feather_sprite.width,
     (float) feather_sprite.height
   };
-  feather.active = true;
+  feather.active = false;
   feather.power = 0;
 
   for (int i = 0; i < MAX_FIREWORKS; i++) {
@@ -139,7 +139,7 @@ void InitGameplayScreen(void)
     shoot[i].active = false;
     shoot[i].color = RED;
   }
-  ammo = 0;
+  ammo = 10;
 
   pause = 0;
   DebugMode = 0;
@@ -175,6 +175,18 @@ void UpdateiFrameTimer(struct Actor *actor)
       actor->iframetimer = 0;
     }
   } else { actor->color = RAYWHITE; actor->currentframe = 0; }
+}
+
+void ResetFeather(void)
+{
+  if (player.hp < 5) {
+    feather.power = 0;
+  } else {
+    feather.power = 1;
+  }
+  feather.hitbox.x = GetScreenWidth() - feather_sprite.width;
+  feather.hitbox.y = player.hitbox.y;
+  feather.active = false;
 }
 
 void UpdateGameplayScreen(void)
@@ -268,25 +280,33 @@ void UpdateGameplayScreen(void)
          }
 
           // Feather spawn logic
+          if (level == LEVEL3) { if ((int) globalTimer % 10 == 0) feather.active = true; }
+          else { if ((int) globalTimer % 50 == 0) feather.active = true; }
           switch (feather.power) {
              case 0:  feather.color = GREEN; break;
              case 1:  feather.color = RED; break;
            }
+           if (feather.active) {
+             if (((feather.hitbox.x + -feather_sprite.width) > GetScreenWidth()
+             || (feather.hitbox.x <= -feather_sprite.width)))  ResetFeather();
              if (CheckCollisionRecs(player.hitbox,  feather.hitbox)) {
                  switch (feather.power) {
-                   case 0: player.hp++; feather.power = 1; break;
-                   case 1: ammo++; if (player.hp < 5) feather.power = 0; else feather.power = 1; break;
+                   case 0: player.hp++;  break;
+                   case 1: ammo++; break;
                  }
-                 if (!mute && player.hp < 5) PlaySoundMulti(fxfeather);
-                 feather.hitbox.x = GetRandomValue(0, 600);
-                 feather.hitbox.y = GetRandomValue(0, GetScreenHeight() - feather_sprite.height);
+                 PlaySoundMulti(fxfeather);
+                 ResetFeather();
              }
+             feather.hitbox.x -= 300.0f * GetFrameTime();
+           }
 
          // Enemy logic
          if (level < 3) {
-           for (int i = 0; i < 2; i++) {
+        /*   for (int i = 0; i < 2; i++) {
              if (CheckCollisionRecs(EnemyBounds[i], enemy.hitbox)) enemy.speed *= -1.0f;
-           }
+           }*/
+           if (((enemy.hitbox.y + enemy.hitbox.height) >= (float)GetScreenHeight()
+           || (enemy.hitbox.y <= 0))) enemy.speed *= -1.0f;
 
            enemy.hitbox.y += enemy.speed * GetFrameTime();
 
@@ -311,8 +331,8 @@ void UpdateGameplayScreen(void)
                       fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
                       switch (level) {
                         case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
-                        case LEVEL2: fireworks[i].speed.x = GetRandomValue(300, 900); break;
-                        case LEVEL3: fireworks[i].speed.x = GetRandomValue(900, 1200); break;
+                        case LEVEL2: fireworks[i].speed.x = GetRandomValue(400, 600); break;
+                        case LEVEL3: fireworks[i].speed.x = GetRandomValue(800, 1000); break;
                       }
                     }
                   break;
@@ -345,15 +365,16 @@ void DrawGameplayScreen(void)
     for (int i = 0; i < MAX_SHOOTS; i++) {
       DrawRectangleLines(shoot[i].hitbox.x, shoot[i].hitbox.y, shoot[i].hitbox.width, shoot[i].hitbox.height, GREEN);
     }
-    for (int i = 0; i < 2; i++) {
+    /*for (int i = 0; i < 2; i++) {
       DrawRectangleLines(EnemyBounds[i].x, EnemyBounds[i].y, EnemyBounds[i].width, EnemyBounds[i].height, WHITE);
-    }
+    }*/
     DrawText(TextFormat("enemy.hitbox.y: %f", enemy.hitbox.y), 10, 200, 20, GREEN);
     DrawText(TextFormat("enemy.speed: %f", enemy.speed), 10, 220, 20, GREEN);
     DrawText(TextFormat("globalTimer: %f", globalTimer), 10, 240, 20, GREEN);
     DrawText(TextFormat("firework_sprite.width: %d", firework_sprite.width), 10, 260, 20, GREEN);
     DrawText(TextFormat("player.iframetimer: %f", player.iframetimer), 10, 280, 20, GREEN);
     DrawText(TextFormat("player.in: %d", player.in), 10, 300, 20, GREEN);
+    DrawText(TextFormat("feather.active: %d", feather.active), 10, 320, 20, GREEN);
     //DrawText(TextFormat("GetTime(): %f", GetTime()), 10, 320, 20, GREEN);
   }
   if (feather.active) DrawTexture(feather_sprite, feather.sprite_pos.x, feather.sprite_pos.y, feather.color);
