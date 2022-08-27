@@ -24,6 +24,7 @@ struct Actor {
     Rectangle frameRec;
     Rectangle hitbox;
     Color color;
+    Sound fxhit;
     bool in;
 };
 
@@ -48,10 +49,7 @@ struct Actor enemy = { 0 };
 struct Attack fireworks[MAX_FIREWORKS] = { 0 };
 struct Attack shoot[MAX_SHOOTS] = { 0 };
 struct Item feather = { 0 };
-//Rectangle EnemyBounds[2] = { 0 };
-Sound fxhit = { 0 };
 Sound fxfeather = { 0 };
-Sound fxboom = { 0 };
 bool pause;
 bool DebugMode;
 bool ewc;

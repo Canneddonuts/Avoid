@@ -22,25 +22,16 @@ Levels level = 0;
 
 Music Gameplaysong = { 0 };
 
-void SetEnemyLevel(void)
-{
-  switch (level) {
-    case LEVEL1: enemy.speed *= 1.0f; break;
-    case LEVEL2: enemy.speed *= 2.0f; break;
-    case LEVEL3: enemy.speed *= 2.0f; break;
-  }
-}
-
 void LoadGamplayScreen(void)
 {
-  fxhit = LoadSound("assets/sfx/hit.wav");
+  player.fxhit = LoadSound("assets/sfx/hit.wav");
+  enemy.fxhit = LoadSound("assets/sfx/boom.wav");
   player_sprite = LoadTexture("assets/gfx/player.png");
   enemy_sprite = LoadTexture("assets/gfx/enemy.png");
   fxfeather = LoadSound("assets/sfx/feather.wav");
   feather_sprite = LoadTexture("assets/gfx/feather.png");
   attack_sprite = LoadTexture("assets/gfx/attack.png");
   firework_sprite = LoadTexture("assets/gfx/firework.png");
-  fxboom = LoadSound("assets/sfx/boom.wav");
   Gameplaysong = LoadMusicStream("assets/bgm/03-Boss.ogg");
 }
 
@@ -97,16 +88,6 @@ void InitGameplayScreen(void)
   enemy.in = false;
   enemy.iframetimer = 0;
 
-/*  for (int i = 0; i < 2; i++) {
-    EnemyBounds[i] = (Rectangle) {
-       0,
-       0,
-       GetScreenWidth(),
-       10
-    };
-  }
-  EnemyBounds[1].y = GetScreenHeight() - EnemyBounds[1].height;*/
-
   feather.hitbox = (Rectangle) {
     GetScreenWidth() - feather_sprite.width,
     GetRandomValue(0, GetScreenHeight() - feather_sprite.height),
@@ -151,15 +132,24 @@ void InitGameplayScreen(void)
   GI_callcount++;
 }
 
-void DamagePlayer(void)
+void SetEnemyLevel(void)
 {
-  if (!player.in) {
-    player.hp--;
-    if (!mute) PlaySoundMulti(fxhit);
-    player.in = true;
+  switch (level) {
+    case LEVEL1: enemy.speed = 200.0f; break;
+    case LEVEL2: enemy.speed = 400.0f; break;
+    case LEVEL3: enemy.speed = 600.0f; break;
+  }
+}
+
+void DamageActor(struct Actor *actor)
+{
+  if (!actor->in) {
+    actor->hp--;
+    if (!mute) PlaySoundMulti(actor->fxhit);
+    actor->in = true;
   }
 
-  player.currentframe = 1;
+  actor->currentframe = 1;
 }
 
 void UpdateiFrameTimer(struct Actor *actor)
@@ -185,7 +175,7 @@ void ResetFeather(void)
     feather.power = 1;
   }
   feather.hitbox.x = GetScreenWidth() - feather_sprite.width;
-  feather.hitbox.y = player.hitbox.y;
+  feather.hitbox.y = GetRandomValue(0, GetScreenHeight() - feather_sprite.height);
   feather.active = false;
 }
 
@@ -269,10 +259,9 @@ void UpdateGameplayScreen(void)
            }
 
            if (CheckCollisionRecs(shoot[i].hitbox, enemy.hitbox) && shoot[i].active) {
-             if (!enemy.in) enemy.hp--;
-             enemy.in = true;
+             DamageActor(&enemy);
              scoreTimer += 300;
-             if (!mute) PlaySoundMulti(fxboom);
+             enemy.hitbox.y = GetRandomValue(0, GetScreenHeight());
              shoot[i].active = false;
            }
 
@@ -302,15 +291,13 @@ void UpdateGameplayScreen(void)
 
          // Enemy logic
          if (level < 3) {
-        /*   for (int i = 0; i < 2; i++) {
-             if (CheckCollisionRecs(EnemyBounds[i], enemy.hitbox)) enemy.speed *= -1.0f;
-           }*/
            if (((enemy.hitbox.y + enemy.hitbox.height) >= (float)GetScreenHeight()
            || (enemy.hitbox.y <= 0))) enemy.speed *= -1.0f;
 
            enemy.hitbox.y += enemy.speed * GetFrameTime();
+           if ((int) globalTimer % 50 == 0) enemy.hitbox.y = GetRandomValue(0, GetScreenHeight() - enemy_sprite.height);
 
-           if (CheckCollisionRecs(player.hitbox, enemy.hitbox)) DamagePlayer();
+           if (CheckCollisionRecs(player.hitbox, enemy.hitbox)) DamageActor(&player);
 
            if (enemy.hp < 1) { level++; enemy.hp = 5; SetEnemyLevel(); }
          }
@@ -318,7 +305,7 @@ void UpdateGameplayScreen(void)
          // Firework logic
          for (int i = 0; i < MAX_FIREWORKS; i++) {
            if (CheckCollisionRecs(player.hitbox, fireworks[i].hitbox)) {
-             DamagePlayer();
+             DamageActor(&player);
              fireworks[i].active = 0;
            }
            switch (fireworks[i].active) {
@@ -398,9 +385,9 @@ void DrawGameplayScreen(void)
 
 void UnloadGameplayScreen()
 {
-  UnloadSound(fxhit);
+  UnloadSound(player.fxhit);
+  UnloadSound(enemy.fxhit);
   UnloadSound(fxfeather);
-  UnloadSound(fxboom);
   UnloadTexture(player_sprite);
   UnloadTexture(feather_sprite);
   UnloadTexture(enemy_sprite);
