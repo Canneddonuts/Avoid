@@ -294,8 +294,8 @@ void UpdateGameplayScreen(void)
            if (((enemy.hitbox.y + enemy.hitbox.height) >= (float)GetScreenHeight()
            || (enemy.hitbox.y <= 0))) enemy.speed *= -1.0f;
 
-           enemy.hitbox.y += enemy.speed * GetFrameTime();
            if ((int) globalTimer % 50 == 0) enemy.hitbox.y = GetRandomValue(0, GetScreenHeight() - enemy_sprite.height);
+           enemy.hitbox.y += enemy.speed * GetFrameTime();
 
            if (CheckCollisionRecs(player.hitbox, enemy.hitbox)) DamageActor(&player);
 
@@ -310,18 +310,15 @@ void UpdateGameplayScreen(void)
            }
            switch (fireworks[i].active) {
               case 0:
-                  fireworks[i].hitbox.x = enemy.hitbox.x - 20;
-                  fireworks[i].hitbox.y = enemy.hitbox.y - 20;
+                  fireworks[i].hitbox.x = GetScreenWidth() + firework_sprite.width;
 
-                    if ((int)globalTimer % 10 == 0) {
-                      fireworks[i].active = 1;
-                      fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
-                      switch (level) {
-                        case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
-                        case LEVEL2: fireworks[i].speed.x = GetRandomValue(400, 600); break;
-                        case LEVEL3: fireworks[i].speed.x = GetRandomValue(800, 1000); break;
-                      }
-                    }
+                  fireworks[i].active = 1;
+                  fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
+                  switch (level) {
+                    case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
+                    case LEVEL2: fireworks[i].speed.x = GetRandomValue(400, 600); break;
+                    case LEVEL3: fireworks[i].speed.x = GetRandomValue(800, 1000); break;
+                  }
                   break;
               case 1:
                 fireworks[i].hitbox.x += GetFrameTime() * -fireworks[i].speed.x;
