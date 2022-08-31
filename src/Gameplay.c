@@ -169,12 +169,14 @@ void UpdateiFrameTimer(struct Actor *actor)
 
 void ResetFeather(void)
 {
-  if (player.hp < 5) {
+  if (player.hp < 2) {
     feather.power = 0;
-  } else {
+  } else if (ammo < 2) {
     feather.power = 1;
+  } else {
+    feather.power = GetRandomValue(0, 1);
   }
-  feather.hitbox.x = GetScreenWidth() - feather_sprite.width;
+  feather.hitbox.x = GetScreenWidth() + feather_sprite.width;
   feather.hitbox.y = GetRandomValue(0, GetScreenHeight() - feather_sprite.height);
   feather.active = false;
 }
@@ -291,11 +293,12 @@ void UpdateGameplayScreen(void)
 
          // Enemy logic
          if (level < 3) {
-           if (((enemy.hitbox.y + enemy.hitbox.height) >= (float)GetScreenHeight()
-           || (enemy.hitbox.y <= 0))) enemy.speed *= -1.0f;
+        /*   if (((enemy.hitbox.y + enemy.hitbox.height) >= (float)GetScreenHeight()
+           || (enemy.hitbox.y <= 0))) enemy.speed *= -1.0f; */
 
-           if ((int) globalTimer % 50 == 0) enemy.hitbox.y = GetRandomValue(0, GetScreenHeight() - enemy_sprite.height);
-           enemy.hitbox.y += enemy.speed * GetFrameTime();
+        //   if ((int) globalTimer % 50 == 0)
+            enemy.hitbox.y = GetRandomValue(0, GetScreenHeight() - enemy_sprite.height);
+        //   enemy.hitbox.y += enemy.speed * GetFrameTime();
 
            if (CheckCollisionRecs(player.hitbox, enemy.hitbox)) DamageActor(&player);
 
