@@ -43,12 +43,12 @@ void UpdateGameoverScreen(void)
 void DrawGameoverScreen(void)
 {
   DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
-  DrawTextEx(ZadoBold, "GAME OVER", (Vector2){ 190, 0 }, 80, 3, RED);
-  if (gameoverSelected == 0) DrawTextEx(ZadoBold, "RETRY", (Vector2){ 350, 200 }, 30, 2, WHITE);
-  else DrawTextEx(ZadoBold, "RETRY", (Vector2){ 350, 200 }, 30, 2, RED);
+  DrawText("GAME OVER", 170, 10, 80, RED);
+  if (gameoverSelected == 0) DrawTextEx(ZadoBold, "RETRY", (Vector2){ 340, 200 }, 40, 2, WHITE);
+  else DrawTextEx(ZadoBold, "RETRY", (Vector2){ 340, 200 }, 40, 2, RED);
 
-  if (gameoverSelected == -1) DrawTextEx(ZadoBold, "TITLE", (Vector2){ 355, 240 }, 30, 2, WHITE);
-  else DrawTextEx(ZadoBold, "TITLE", (Vector2){ 355, 240 }, 30, 2, RED);
+  if (gameoverSelected == -1) DrawTextEx(ZadoBold, "TITLE", (Vector2){ 345, 250 }, 40, 2, WHITE);
+  else DrawTextEx(ZadoBold, "TITLE", (Vector2){ 345, 250 }, 40, 2, RED);
 }
 
 int FinishGameoverScreen(void)

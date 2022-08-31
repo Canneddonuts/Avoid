@@ -33,7 +33,7 @@ void UpdateEndingScreen(void)
 void DrawEndingScreen(void)
 {
   DrawTexture(background, 0, 0, GOLD);
-  DrawTextEx(ZadoBold, "THANK YOU SO MUCH FOR PLAYING!!!", (Vector2){ 10, 10 }, 45, 2, GOLD);
+  DrawText("THANK YOU SO MUCH FOR PLAYING!!!", 10, 10, 40, GOLD);
   DrawTextEx(ZadoBold, "Canneddonuts 2022", (Vector2){ 380, 400 }, 40, 2, WHITE);
   DrawTextEx(ZadoBold, "Press 'ENTER'", (Vector2){ 5, 400 }, 40, 2, WHITE);
 }

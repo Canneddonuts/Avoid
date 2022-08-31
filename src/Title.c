@@ -18,13 +18,13 @@ int titleSelected = 0, finishfromTitleScreen = 0;
 void DrawScore(void)
 {
   if (bestscore >= 10000)
-     DrawTextEx(ZadoBold, TextFormat("BEST: %i", bestscore), (Vector2){ 580, 0 }, 30, 2, (Color){ 222, 181, 0, 255 });
+     DrawText(TextFormat("BEST: %i", bestscore),  580, 0, 30, (Color){ 222, 181, 0, 255 });
   else if (bestscore >= 5000)
-     DrawTextEx(ZadoBold, TextFormat("BEST: %i", bestscore), (Vector2){ 580, 0 }, 30, 2, (Color){ 149, 148, 147, 255 });
+     DrawText(TextFormat("BEST: %i", bestscore),  580, 0, 30, (Color){ 149, 148, 147, 255 });
   else if (bestscore >= 1000)
-     DrawTextEx(ZadoBold, TextFormat("BEST: %i", bestscore), (Vector2){ 580, 0 }, 30, 2, (Color){ 138, 72, 4, 255 });
+     DrawText(TextFormat("BEST: %i", bestscore), 580, 0, 30,(Color){ 138, 72, 4, 255 });
   else
-     DrawTextEx(ZadoBold, TextFormat("BEST: %i", bestscore), (Vector2){ 580, 0 }, 30, 2, BLUE);
+     DrawText(TextFormat("BEST: %i", bestscore), 580, 0, 30, BLUE);
 }
 
 
@@ -49,15 +49,15 @@ void DrawTitleScreen(void)
 {
   DrawTexture(background, 0, 0, GRAY);
   DrawTextEx(ZadoBold, "Avoid", (Vector2){ 300, 0 }, 80, 5, BLUE);
-  //  DrawText("Controls", 10, 10, 30, BLUE);
+    DrawText("Controls", 5, 10, 30, BLUE);
     DrawScore();
-  /*  DrawText("Press the arrow keys or 'DPAD' to move and 'X' to dash", 10, 40, 10, WHITE);
-    DrawText("Press 'ENTER' or 'START' to pause", 10, 60, 10, WHITE);
-    DrawText("Press 'M' to mute", 10, 80, 10, WHITE);
-    DrawText("Press 'Left-ALT' + 'F' for full screen", 10, 100, 10, WHITE);
-    DrawText("Press 'R' to restart", 10, 120, 10, WHITE);
-    DrawText("Press 'ENTER' or 'START' to select an option", 10, 140, 10, WHITE);
-    DrawText("Press 'X' or 'A' on a gamepad to shoot", 10, 160, 10, WHITE); */
+    DrawText("Press the arrow keys or 'DPAD' to move and 'X' to dash", 5, 40, 10, WHITE);
+    DrawText("Press 'ENTER' or 'START' to pause", 5, 60, 10, WHITE);
+    DrawText("Press 'M' to mute", 5, 80, 10, WHITE);
+    DrawText("Press 'Left-ALT' + 'F' for full screen", 5, 100, 10, WHITE);
+    DrawText("Press 'R' to restart", 5, 120, 10, WHITE);
+    DrawText("Press 'ENTER' or 'START' to select an option", 5, 140, 10, WHITE);
+    DrawText("Press 'X' or 'A' on a gamepad to shoot", 5, 160, 10, WHITE);
 //  DrawText("Ver: 0.1", 680, 420, 30, WHITE);
     if (titleSelected == 0) DrawTextEx(ZadoBold,"PLAY", (Vector2){ 360, 220 }, 30, 2, WHITE);
     else DrawTextEx(ZadoBold,"PLAY", (Vector2){ 360, 220 }, 30, 2, BLUE);

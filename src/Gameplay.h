@@ -52,7 +52,6 @@ struct Item feather = { 0 };
 Sound fxfeather = { 0 };
 bool pause;
 bool DebugMode;
-bool ewc;
 int ammo = 0;
 int GI_callcount = 0;
 
