@@ -26,6 +26,7 @@ static int transFromScreen = -1;
 static int transToScreen = -1;
 
 GameScreen currentScreen = 0;
+Levels level = 0;
 
 Texture2D background;
 Texture2D player_sprite;
@@ -73,6 +74,7 @@ void gameSetup(void)
 {
   // asset loading & setting of variable values
    currentScreen = TITLE;
+   level = LEVEL1;
    background = LoadTexture("assets/gfx/background.png");
    ZadoBold = LoadFontEx("assets/fonts/ZadoBold.ttf", 96, 0, 110);
 
@@ -104,6 +106,7 @@ static void update_transition(void)
         case CREDITS: UnloadCreditsScreen(); break;
         case OPTIONS: UnloadOptionsScreen(); break;
         case ENDING: UnloadEndingScreen(); break;
+        case LEVELSEL: UnloadLevelSelScreen(); break;
         default: break;
       }
 
@@ -114,6 +117,7 @@ static void update_transition(void)
         case CREDITS: InitCreditsScreen(); break;
         case OPTIONS: InitOptionsScreen(); break;
         case ENDING: InitEndingScreen(); break;
+        case LEVELSEL: InitLevelSelScreen(); break;
         default: break;
       }
 
@@ -154,7 +158,7 @@ static void update_draw_frame(void)
 
         switch (FinishTitleScreen()) {
           case 1: transition_to_screen(CREDITS); break;
-          case 2: transition_to_screen(GAMEPLAY); break;
+          case 2: transition_to_screen(LEVELSEL); break;
           case 3: transition_to_screen(OPTIONS); break;
         }
       } break;
@@ -188,6 +192,11 @@ static void update_draw_frame(void)
 
         if (FinishEndingScreen() == 1) transition_to_screen(TITLE);
       } break;
+      case LEVELSEL: {
+        UpdateLevelSelScreen();
+
+        if (FinishLevelSelScreen() == 1) transition_to_screen(GAMEPLAY);
+      } break;
       default: break;
     }
   } else update_transition();
@@ -203,6 +212,7 @@ static void update_draw_frame(void)
        case GAMEOVER: DrawGameoverScreen(); break;
        case OPTIONS: DrawOptionsScreen(); break;
        case ENDING: DrawEndingScreen(); break;
+       case LEVELSEL: DrawLevelSelScreen(); break;
        default: break;
      }
 
@@ -222,6 +232,7 @@ static void unloadGame(void)
       case CREDITS: UnloadCreditsScreen(); break;
       case OPTIONS: UnloadOptionsScreen(); break;
       case ENDING: UnloadEndingScreen(); break;
+      case LEVELSEL: UnloadLevelSelScreen(); break;
       default: break;
     }
 

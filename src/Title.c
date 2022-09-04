@@ -30,6 +30,7 @@ void DrawScore(void)
 
 void InitTitleScreen(void)
 {
+  titleSelected = 0;
   finishfromTitleScreen = 0;
 }
 

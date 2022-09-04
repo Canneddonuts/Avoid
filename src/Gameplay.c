@@ -18,7 +18,6 @@
 #include "Gfx.h"
 
 int score = 0, bestscore = 0, finishfromGameplayScreen = 0;
-Levels level = 0;
 
 Music Gameplaysong = { 0 };
 
@@ -40,8 +39,6 @@ void InitGameplayScreen(void)
   PlayMusicStream(Gameplaysong);
 
   finishfromGameplayScreen = 0;
-
-  level = LEVEL1;
 
   globalTimer = 0;
 
@@ -240,6 +237,8 @@ void UpdateGameplayScreen(void)
          if (IsKeyPressed(KEY_G)) finishfromGameplayScreen = 1;
          if (IsKeyPressed(KEY_R)) finishfromGameplayScreen = 2;
          if (IsKeyPressed(KEY_W)) finishfromGameplayScreen = 3;
+         if (IsKeyPressed(KEY_EQUAL)) level++;
+         if (IsKeyPressed(KEY_MINUS)) level--;
 
          // call gameover when killed
          if (player.hp < 1) { StopMusicStream(Gameplaysong); finishfromGameplayScreen = 1; }
@@ -249,14 +248,6 @@ void UpdateGameplayScreen(void)
            if (shoot[i].active) {
              shoot[i].hitbox.x += shoot[i].speed.x * GetFrameTime();
            }
-
-           if (CheckCollisionRecs(shoot[i].hitbox, enemy.hitbox) && shoot[i].active) {
-             DamageActor(&enemy);
-             scoreTimer += 300;
-             enemy.hitbox.y = GetRandomValue(0, GetScreenHeight());
-             shoot[i].active = false;
-           }
-
            if (shoot[i].hitbox.x + shoot[i].hitbox.width >= GetScreenWidth() + attack_sprite.width) shoot[i].active = false;
          }
 
@@ -282,10 +273,19 @@ void UpdateGameplayScreen(void)
            }
 
          // Enemy logic
-         if (level < 3) {
+         if (level == 2) {
            if ((int)globalTimer % 40 == 0) enemy.hitbox.y = GetRandomValue(0, GetScreenHeight() - enemy_sprite.height);
 
            if (CheckCollisionRecs(player.hitbox, enemy.hitbox)) DamageActor(&player);
+
+           for (int i = 0; i < MAX_SHOOTS; i++) {
+             if (CheckCollisionRecs(shoot[i].hitbox, enemy.hitbox) && shoot[i].active) {
+               DamageActor(&enemy);
+               scoreTimer += 300;
+               enemy.hitbox.y = GetRandomValue(0, GetScreenHeight());
+               shoot[i].active = false;
+             }
+           }
 
            if (enemy.hp < 1) { level++; enemy.hp = 5; }
          }
@@ -347,13 +347,13 @@ void DrawGameplayScreen(void)
     DrawText(TextFormat("GetTime(): %f", GetTime()), 10, 340, 20, GREEN);
   }
   if (feather.active) DrawTexture(feather_sprite, feather.sprite_pos.x, feather.sprite_pos.y, feather.color);
-  DrawTextureRec(enemy_sprite, enemy.frameRec, enemy.sprite_pos, enemy.color);
   for (int i = 0; i < MAX_FIREWORKS; i++) {
     DrawTexture(firework_sprite, fireworks[i].sprite_pos.x, fireworks[i].sprite_pos.y, fireworks[i].color);
   }
   for (int i = 0; i < MAX_SHOOTS; i++) {
     if (shoot[i].active) DrawTexture(attack_sprite, shoot[i].sprite_pos.x, shoot[i].sprite_pos.y, shoot[i].color);
   }
+  if (level == 2) DrawTextureRec(enemy_sprite, enemy.frameRec, enemy.sprite_pos, enemy.color);
   DrawTextureRec(player_sprite, player.frameRec, player.sprite_pos, player.color);
   DrawTexture(feather_sprite, 0, 0, GREEN);
   DrawText(TextFormat("= %i", player.hp), 30, 30, 30, GREEN);

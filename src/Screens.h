@@ -9,9 +9,11 @@
 #ifndef SCREENS_HEADER
 #define SCREENS_HEADER
 
-typedef enum GameScreen { TITLE = 0, GAMEPLAY, GAMEOVER, CREDITS, OPTIONS, ENDING } GameScreen;
+typedef enum GameScreen { TITLE = 0, GAMEPLAY, GAMEOVER, CREDITS, OPTIONS, ENDING, LEVELSEL } GameScreen;
+typedef enum Levels { LEVEL1 = 0, LEVEL2, LEVEL3 } Levels;
 
 extern GameScreen currentScreen;
+extern Levels level;
 
 void InitTitleScreen(void);
 void UpdateTitleScreen(void);
@@ -49,5 +51,11 @@ void UpdateEndingScreen(void);
 void DrawEndingScreen(void);
 void UnloadEndingScreen(void);
 int FinishEndingScreen(void);
+
+void InitLevelSelScreen(void);
+void UpdateLevelSelScreen(void);
+void DrawLevelSelScreen(void);
+void UnloadLevelSelScreen(void);
+int FinishLevelSelScreen(void);
 
 #endif
