@@ -51,6 +51,7 @@ Sound fxfeather = { 0 };
 bool pause;
 bool DebugMode;
 int ammo = 0;
+int fireworkAmount = 0;
 int GI_callcount = 0;
 
 #endif

@@ -174,6 +174,7 @@ static void update_draw_frame(void)
           case 1: transition_to_screen(GAMEOVER); break;
           case 2: transition_to_screen(TITLE); break;
           case 3: transition_to_screen(ENDING); break;
+          case 4: transition_to_screen(LEVELSEL); break;
         }
       } break;
       case GAMEOVER: {
