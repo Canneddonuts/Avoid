@@ -42,9 +42,10 @@ void InitGameplayScreen(void)
 
   globalTimer = 0;
 
+  if (player.hp < 1) player.hp = 1;
+
   player.currentframe = 0;
   player.speed = 300.0f;
-  player.hp = PLAYER_HP;
   if (GI_callcount < 1) {
     player.frameRec = (Rectangle) {
       player.hitbox.x,
@@ -116,7 +117,6 @@ void InitGameplayScreen(void)
     shoot[i].active = false;
     shoot[i].color = RED;
   }
-  ammo = 10;
   fireworkAmount = 100;
 
   pause = 0;
@@ -174,7 +174,7 @@ void UpdateGameplayScreen(void)
    if (INPUT_OPTION_PRESSED) pause = !pause;
    // code to end the game
    if (level > 2) { StopMusicStream(Gameplaysong); finishfromGameplayScreen = 3; }
-   if (fireworkAmount < 1 && level < 2) { StopMusicStream(Gameplaysong); finishfromGameplayScreen = 4; }
+   if (fireworkAmount < 1 && level < 2) { StopMusicStream(Gameplaysong); levelunlocked++; finishfromGameplayScreen = 4; }
 
    if (!mute) UpdateMusicStream(Gameplaysong);
 

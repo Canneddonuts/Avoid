@@ -10,7 +10,6 @@
 #define GAMEPLAY_HEADER
 
 #define MAX_FIREWORKS 10
-#define PLAYER_HP 3
 #define MAX_SHOOTS 3
 
 struct Actor {

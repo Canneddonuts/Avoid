@@ -77,6 +77,7 @@ void gameSetup(void)
    level = LEVEL1;
    background = LoadTexture("assets/gfx/background.png");
    ZadoBold = LoadFontEx("assets/fonts/ZadoBold.ttf", 96, 0, 110);
+   InitTitleScreen();
 
    SetMasterVolume(0.5);
 }

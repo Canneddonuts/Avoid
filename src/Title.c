@@ -10,10 +10,14 @@
 
 #include "Screens.h"
 #include "Controls.h"
+#include "Music.h"
+#include "Options.h"
 #include "Score.h"
 #include "Gfx.h"
 
 int titleSelected = 0, finishfromTitleScreen = 0;
+Music Titlesong = { 0 };
+
 
 void DrawScore(void)
 {
@@ -32,18 +36,21 @@ void InitTitleScreen(void)
 {
   titleSelected = 0;
   finishfromTitleScreen = 0;
+  Titlesong = LoadMusicStream("assets/bgm/04-Distant-Misadventure.ogg");
+  PlayMusicStream(Titlesong);
 }
 
 void UpdateTitleScreen(void)
 {
+  if (!mute) UpdateMusicStream(Titlesong);
   if (INPUT_UP_PRESSED) titleSelected++;
   if (INPUT_DOWN_PRESSED) titleSelected--;
   if (titleSelected > 0) titleSelected--;
   if (titleSelected < -2) titleSelected++;
 
-  if ((titleSelected == 0) && (INPUT_OPTION_PRESSED)) finishfromTitleScreen = 2;
-  if ((titleSelected == -1) && (INPUT_OPTION_PRESSED)) finishfromTitleScreen = 1;
-  if ((titleSelected == -2) && (INPUT_OPTION_PRESSED)) finishfromTitleScreen = 3;
+  if ((titleSelected == 0) && (INPUT_OPTION_PRESSED))  { StopMusicStream(Titlesong); finishfromTitleScreen = 2; }
+  if ((titleSelected == -1) && (INPUT_OPTION_PRESSED)) { StopMusicStream(Titlesong); finishfromTitleScreen = 1; }
+  if ((titleSelected == -2) && (INPUT_OPTION_PRESSED)) { StopMusicStream(Titlesong); finishfromTitleScreen = 3; }
 }
 
 void DrawTitleScreen(void)
@@ -72,7 +79,7 @@ void DrawTitleScreen(void)
 
 void UnloadTitleScreen(void)
 {
-
+  UnloadMusicStream(Titlesong);
 }
 
 int FinishTitleScreen(void)
