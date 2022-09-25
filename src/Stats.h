@@ -1,15 +1,16 @@
 /*
 -    Avoid ~ a game by Canneddonuts
--      Filename ~ Score.h
+-      Filename ~ Stats.h
 -       Author ~ Return0ne
 -            2022
 -         *no license*
 */
 
-#ifndef SCORE_HEADER
-#define SCORE_HEADER
+#ifndef STATS_HEADER
+#define STATS_HEADER
 
-extern int bestscore;
 extern int score;
+extern int greenfeathers;
+extern int redfeathers;
 
 #endif

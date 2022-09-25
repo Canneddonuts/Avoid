@@ -12,14 +12,25 @@
 #include "Controls.h"
 #include "Options.h"
 #include "Gameplay.h"
-#include "Score.h"
+#include "Stats.h"
 #include "Timers.h"
 #include "Music.h"
 #include "Gfx.h"
 
-int score = 0, bestscore = 0, finishfromGameplayScreen = 0;
+int score = 0, bestscore = 0, finishfromGameplayScreen = 0, redfeathers = 0, greenfeathers = 0;
 
 Music Gameplaysong = { 0 };
+
+bool CheckFireworkActivity(void)
+{
+  int matches = 0, val = 0;
+  for (int i = 0; i < MAX_FIREWORKS; i++) {
+    if (fireworks[i].active == val) matches++;
+  }
+
+  if (matches == MAX_FIREWORKS) return true;
+  else return false;
+}
 
 void LoadGamplayScreen(void)
 {
@@ -95,13 +106,19 @@ void InitGameplayScreen(void)
   feather.power = 0;
 
   for (int i = 0; i < MAX_FIREWORKS; i++) {
-    fireworks[i].active = 0;
+    fireworks[i].active = 1;
     fireworks[i].hitbox = (Rectangle) {
-      630,
-      GetRandomValue(0, GetScreenHeight()),
+      GetScreenWidth() + firework_sprite.width,
+      0,
       (float) firework_sprite.width/2 + 10,
       (float) firework_sprite.height
     };
+    fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
+    switch (level) {
+      case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
+      case LEVEL2: fireworks[i].speed.x = GetRandomValue(400, 600); break;
+      case LEVEL3: fireworks[i].speed.x = GetRandomValue(800, 1000); break;
+    }
     fireworks[i].color = RAYWHITE;
   }
 
@@ -117,13 +134,16 @@ void InitGameplayScreen(void)
     shoot[i].active = false;
     shoot[i].color = RED;
   }
-  fireworkAmount = 100;
+  switch (level) {
+    case LEVEL1: fireworkAmount = 50; break;
+    case LEVEL2: fireworkAmount = 200; break;
+    case LEVEL3: fireworkAmount = 500; break;
+  }
 
   pause = 0;
   DebugMode = 0;
   pauseTimer = 0;
-  score = 0;
-  scoreTimer = 0;
+
 
   GI_callcount++;
 }
@@ -169,12 +189,11 @@ void ResetFeather(void)
 }
 
 void UpdateGameplayScreen(void)
-
 {
    if (INPUT_OPTION_PRESSED) pause = !pause;
    // code to end the game
    if (level > 2) { StopMusicStream(Gameplaysong); finishfromGameplayScreen = 3; }
-   if (fireworkAmount < 1 && level < 2) { StopMusicStream(Gameplaysong); levelunlocked++; finishfromGameplayScreen = 4; }
+   if (CheckFireworkActivity() && level < 2) { StopMusicStream(Gameplaysong); levelunlocked++; finishfromGameplayScreen = 4; }
 
    if (!mute) UpdateMusicStream(Gameplaysong);
 
@@ -231,7 +250,8 @@ void UpdateGameplayScreen(void)
          // pass the address of each struct to the UpdateiFrameTimer function
          UpdateiFrameTimer(&player);
          UpdateiFrameTimer(&enemy);
-         if (score >= bestscore)  bestscore = score;
+         greenfeathers = player.hp;
+         redfeathers = ammo;
 
          // Debug stuff
          if (IsKeyPressed(KEY_D)) DebugMode = !DebugMode;
@@ -311,7 +331,7 @@ void UpdateGameplayScreen(void)
                 case 0:
                     fireworks[i].hitbox.x = GetScreenWidth() + firework_sprite.width;
 
-                    fireworks[i].active = 1;
+                    if (fireworkAmount > 0) { fireworkAmount--; fireworks[i].active = 1; }
                     fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
                     switch (level) {
                       case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
@@ -323,7 +343,7 @@ void UpdateGameplayScreen(void)
                   fireworks[i].hitbox.x += GetFrameTime() * -fireworks[i].speed.x;
                   // Firework wall collision
                   if (((fireworks[i].hitbox.x + -firework_sprite.width) > GetScreenWidth()
-                  || (fireworks[i].hitbox.x <= -firework_sprite.width))) { fireworkAmount--; fireworks[i].active = 0; }
+                  || (fireworks[i].hitbox.x <= -firework_sprite.width)))  fireworks[i].active = 0;
                   break;
               }
          }
@@ -371,8 +391,8 @@ void DrawGameplayScreen(void)
   DrawText(TextFormat("= %i", player.hp), 30, 30, 30, GREEN);
   DrawTexture(feather_sprite, 80, 0, RED);
   DrawText(TextFormat("= %i", ammo), 110, 30, 30, RED);
-  if (level == 2)  DrawText(TextFormat("ENEMY HP: %i", enemy.hp), GetScreenWidth() - 200, 0, 30, RED);
-  else  DrawText(TextFormat("FIREWORKS LEFT: %i", fireworkAmount), GetScreenWidth() - 260, 0, 20, GREEN);
+  if (level == 2)  DrawText(TextFormat("ENEMY HP: %i", enemy.hp), GetScreenWidth() - 380, 0, 20, RED);
+  DrawText(TextFormat("FIREWORKS LEFT: %i", fireworkAmount), GetScreenWidth() - 240, 0, 20, GREEN);
   if (score >= 10000) DrawText(TextFormat("SCORE: %i", score), 10, 65, 30, (Color){ 222, 181, 0, 255 });
   else DrawText(TextFormat("SCORE: %i", score), 10, 65, 30, BLUE);
   if (pause && (((int)pauseTimer/30)%2)) DrawTextEx(ZadoBold, "PAUSED", (Vector2){ 280, 160 }, 60, 2, WHITE);

@@ -12,25 +12,10 @@
 #include "Controls.h"
 #include "Music.h"
 #include "Options.h"
-#include "Score.h"
 #include "Gfx.h"
 
 int titleSelected = 0, finishfromTitleScreen = 0;
 Music Titlesong = { 0 };
-
-
-void DrawScore(void)
-{
-  if (bestscore >= 10000)
-     DrawText(TextFormat("BEST: %i", bestscore),  580, 0, 30, (Color){ 222, 181, 0, 255 });
-  else if (bestscore >= 5000)
-     DrawText(TextFormat("BEST: %i", bestscore),  580, 0, 30, (Color){ 149, 148, 147, 255 });
-  else if (bestscore >= 1000)
-     DrawText(TextFormat("BEST: %i", bestscore), 580, 0, 30,(Color){ 138, 72, 4, 255 });
-  else
-     DrawText(TextFormat("BEST: %i", bestscore), 580, 0, 30, BLUE);
-}
-
 
 void InitTitleScreen(void)
 {
@@ -58,7 +43,6 @@ void DrawTitleScreen(void)
   DrawTexture(background, 0, 0, GRAY);
   DrawTextEx(ZadoBold, "Avoid", (Vector2){ 300, 0 }, 80, 5, BLUE);
     DrawText("Controls", 5, 10, 30, BLUE);
-    DrawScore();
     DrawText("Press the arrow keys or 'DPAD' to move and 'X' to dash", 5, 40, 10, WHITE);
     DrawText("Press 'ENTER' or 'START' to pause", 5, 60, 10, WHITE);
     DrawText("Press 'M' to mute", 5, 80, 10, WHITE);
