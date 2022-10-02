@@ -14,7 +14,9 @@ typedef enum Levels { LEVEL1 = 0, LEVEL2, LEVEL3 } Levels;
 
 extern GameScreen currentScreen;
 extern Levels level;
-extern int levelunlocked;
+extern int nextlevel;
+extern bool levelunlocked[3];
+
 
 void InitTitleScreen(void);
 void UpdateTitleScreen(void);

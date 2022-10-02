@@ -193,7 +193,7 @@ void UpdateGameplayScreen(void)
    if (INPUT_OPTION_PRESSED) pause = !pause;
    // code to end the game
    if (level > 2) { StopMusicStream(Gameplaysong); finishfromGameplayScreen = 3; }
-   if (CheckFireworkActivity() && level < 2) { StopMusicStream(Gameplaysong); levelunlocked++; finishfromGameplayScreen = 4; }
+   if (CheckFireworkActivity() && level < 2) { StopMusicStream(Gameplaysong); levelunlocked[nextlevel] = true; nextlevel++; finishfromGameplayScreen = 4; }
 
    if (!mute) UpdateMusicStream(Gameplaysong);
 
