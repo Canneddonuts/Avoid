@@ -51,6 +51,8 @@ void InitGameplayScreen(void)
 
   finishfromGameplayScreen = 0;
 
+  nextlevel = level + 1;
+
   globalTimer = 0;
 
   if (player.hp < 1) player.hp = 1;
@@ -193,7 +195,7 @@ void UpdateGameplayScreen(void)
    if (INPUT_OPTION_PRESSED) pause = !pause;
    // code to end the game
    if (level > 2) { StopMusicStream(Gameplaysong); finishfromGameplayScreen = 3; }
-   if (CheckFireworkActivity() && level < 2) { StopMusicStream(Gameplaysong); levelunlocked[nextlevel] = true; nextlevel++; finishfromGameplayScreen = 4; }
+   if (CheckFireworkActivity() && level < 2) { StopMusicStream(Gameplaysong); levelunlocked[nextlevel] = true; finishfromGameplayScreen = 4; }
 
    if (!mute) UpdateMusicStream(Gameplaysong);
 
@@ -308,6 +310,8 @@ void UpdateGameplayScreen(void)
                enemy.hitbox.y = GetRandomValue(0, GetScreenHeight());
                shoot[i].active = false;
              }
+              if (((shoot[i].hitbox.x + -attack_sprite.width) > GetScreenWidth()
+              || (shoot[i].hitbox.x <= -attack_sprite.width)))  shoot[i].active = 0;
            }
 
            if (enemy.hp < 1) { level++; enemy.hp = 5; }
@@ -319,14 +323,13 @@ void UpdateGameplayScreen(void)
                DamageActor(&player);
                fireworks[i].active = 0;
              }
-            /* for (int j = 0; j < MAX_SHOOTS; j++) {
+             for (int j = 0; j < MAX_SHOOTS; j++) {
                if (CheckCollisionRecs(shoot[j].hitbox, fireworks[i].hitbox) && shoot[j].active) {
                  if (!mute) PlaySoundMulti(enemy.fxhit);
                  fireworks[i].active = 0;
                  fireworkAmount--;
-                 shoot[j].active = 0;
                }
-             } */
+             } 
              switch (fireworks[i].active) {
                 case 0:
                     fireworks[i].hitbox.x = GetScreenWidth() + firework_sprite.width;

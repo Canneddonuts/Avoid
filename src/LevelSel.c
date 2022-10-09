@@ -18,8 +18,6 @@ bool levelunlocked[3] = {1, 0 , 0};
 
 void InitLevelSelScreen(void)
 {
-  nextlevel = level + 1;
-
   feather_sprite = LoadTexture("assets/gfx/feather.png");
   finishfromLevelSelScreen = 0;
 }
@@ -59,7 +57,7 @@ void DrawLevelSelScreen(void)
   else  DrawText("3", 300, 220, 60, GRAY);
 
  // printf("%d, %d, %d\n", levelunlocked[0], levelunlocked[1], levelunlocked[2]);
-  printf("%d\n", levelunlocked[nextlevel]);
+  // printf("%d\n", levelunlocked[nextlevel]);
 }
 
 void UnloadLevelSelScreen(void)
