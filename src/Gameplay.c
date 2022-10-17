@@ -21,14 +21,14 @@ int score = 0, bestscore = 0, finishfromGameplayScreen = 0, redfeathers = 0, gre
 
 Music Gameplaysong = { 0 };
 
-bool CheckFireworkActivity(void)
+bool CheckAttackActivity(struct Attack attack[], int val, int max)
 {
-  int matches = 0, val = 0;
-  for (int i = 0; i < MAX_FIREWORKS; i++) {
-    if (fireworks[i].active == val) matches++;
+  int matches = 0;
+  for (int i = 0; i < max; i++) {
+    if (attack[i].active == val) matches++;
   }
 
-  if (matches == MAX_FIREWORKS) return true;
+  if (matches == max) return true;
   else return false;
 }
 
@@ -195,7 +195,7 @@ void UpdateGameplayScreen(void)
    if (INPUT_OPTION_PRESSED) pause = !pause;
    // code to end the game
    if (level > 2) { StopMusicStream(Gameplaysong); finishfromGameplayScreen = 3; }
-   if (CheckFireworkActivity() && level < 2) { StopMusicStream(Gameplaysong); levelunlocked[nextlevel] = true; finishfromGameplayScreen = 4; }
+   if (CheckAttackActivity(fireworks, 0, MAX_FIREWORKS) && level < 2) { StopMusicStream(Gameplaysong); levelunlocked[nextlevel] = true; finishfromGameplayScreen = 4; }
 
    if (!mute) UpdateMusicStream(Gameplaysong);
 
@@ -329,7 +329,7 @@ void UpdateGameplayScreen(void)
                  fireworks[i].active = 0;
                  fireworkAmount--;
                }
-             } 
+             }
              switch (fireworks[i].active) {
                 case 0:
                     fireworks[i].hitbox.x = GetScreenWidth() + firework_sprite.width;
