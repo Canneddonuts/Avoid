@@ -46,14 +46,14 @@ void DrawLevelSelScreen(void)
   else DrawText(TextFormat("SCORE: %i", score), 10, 65, 30, BLUE);
 
   if (levelSelected == 0) DrawText("1", 100, 220, 60, WHITE);
-  else DrawText("1", 100, 220, 60, BLUE);
+  else DrawText("1", 100, 220, 60, GREEN);
 
   if (levelSelected == 1) DrawText("2", 200, 220, 60, WHITE);
-  else if (levelunlocked[1]) DrawText("2", 200, 220, 60, BLUE);
+  else if (levelunlocked[1]) DrawText("2", 200, 220, 60, GREEN);
   else DrawText("2", 200, 220, 60, GRAY);
 
   if (levelSelected == 2) DrawText("3", 300, 220, 60, WHITE);
-  else  if (levelunlocked[2]) DrawText("3", 300, 220, 60, BLUE);
+  else  if (levelunlocked[2]) DrawText("3", 300, 220, 60, RED);
   else  DrawText("3", 300, 220, 60, GRAY);
 
  // printf("%d, %d, %d\n", levelunlocked[0], levelunlocked[1], levelunlocked[2]);

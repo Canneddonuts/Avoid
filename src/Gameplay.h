@@ -10,7 +10,7 @@
 #define GAMEPLAY_HEADER
 
 #define MAX_FIREWORKS 10
-#define MAX_SHOOTS 3
+#define MAX_SHOOTS 5
 
 struct Actor {
     float speed;

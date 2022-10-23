@@ -327,6 +327,7 @@ void UpdateGameplayScreen(void)
                if (CheckCollisionRecs(shoot[j].hitbox, fireworks[i].hitbox) && shoot[j].active) {
                  if (!mute) PlaySoundMulti(enemy.fxhit);
                  fireworks[i].active = 0;
+                 scoreTimer += 300;
                  fireworkAmount--;
                }
              }
