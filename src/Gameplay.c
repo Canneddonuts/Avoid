@@ -7,6 +7,7 @@
 */
 
 #include "../include/raylib.h"
+#include <math.h>
 
 #include "Screens.h"
 #include "Controls.h"
@@ -56,6 +57,7 @@ void InitGameplayScreen(void)
   globalTimer = 0;
 
   if (player.hp < 1) player.hp = 1;
+  if (ammo < 5) ammo = 5;
 
   player.currentframe = 0;
   player.speed = 300.0f;
@@ -70,8 +72,8 @@ void InitGameplayScreen(void)
   player.hitbox = (Rectangle) {
     0,
     100,
-    (float) player_sprite.width/3,
-    (float) player_sprite.height/2 +5
+    (float) player_sprite.width/3 - 20,
+    (float) player_sprite.height - 20
   };
   player.iframetimer = 0;
   player.in = false;
@@ -116,11 +118,12 @@ void InitGameplayScreen(void)
       (float) firework_sprite.height
     };
     fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
-    switch (level) {
+  /*  switch (level) {
       case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
       case LEVEL2: fireworks[i].speed.x = GetRandomValue(400, 600); break;
       case LEVEL3: fireworks[i].speed.x = GetRandomValue(800, 1000); break;
-    }
+    } */
+    fireworks[i].speed.x = GetRandomValue(100, 300);
     fireworks[i].color = RAYWHITE;
   }
 
@@ -289,7 +292,7 @@ void UpdateGameplayScreen(void)
              if (CheckCollisionRecs(player.hitbox,  feather.hitbox)) {
                  switch (feather.power) {
                    case 0: player.hp++;  break;
-                   case 1: ammo++; break;
+                   case 1: ammo += 5; break;
                  }
                  if (!mute) PlaySoundMulti(fxfeather);
                  ResetFeather();
@@ -337,14 +340,16 @@ void UpdateGameplayScreen(void)
 
                     if (fireworkAmount > 0) { fireworkAmount--; fireworks[i].active = 1; }
                     fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
-                    switch (level) {
-                      case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
+                   /* switch (level) {
+                      case LEVEL1: fireworks[i].speed.x = GetFrameTime() break;
                       case LEVEL2: fireworks[i].speed.x = GetRandomValue(400, 600); break;
                       case LEVEL3: fireworks[i].speed.x = GetRandomValue(800, 1000); break;
-                    }
+                    } */
                     break;
                 case 1:
-                  fireworks[i].hitbox.x += GetFrameTime() * -fireworks[i].speed.x;
+                  trigMov = sin(2*PI/100*fireworks[i].hitbox.x) * 200;
+                  fireworks[i].hitbox.x -= fireworks[i].speed.x * GetFrameTime();
+                  fireworks[i].hitbox.y += trigMov*GetFrameTime();
                   // Firework wall collision
                   if (((fireworks[i].hitbox.x + -firework_sprite.width) > GetScreenWidth()
                   || (fireworks[i].hitbox.x <= -firework_sprite.width)))  fireworks[i].active = 0;

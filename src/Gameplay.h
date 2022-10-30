@@ -49,8 +49,9 @@ struct Item feather = { 0 };
 Sound fxfeather = { 0 };
 bool pause;
 bool DebugMode;
-int ammo = 0;
+int ammo = 5;
 int fireworkAmount = 0;
 int GI_callcount = 0;
+int trigMov;
 
 #endif
