@@ -1,16 +1,13 @@
 /*
 -    Avoid ~ a game by Canneddonuts
--      Filename ~ Gameplay.h
+-      Filename ~ Gstructs.h
 -       Author ~ Return0ne
 -            2022
 -         *no license*
 */
 
-#ifndef GAMEPLAY_HEADER
-#define GAMEPLAY_HEADER
-
-#define MAX_FIREWORKS 10
-#define MAX_SHOOTS 5
+#ifndef GAMESTRUCTS_HEADER
+#define GAMESTRUCTS_HEADER
 
 struct Actor {
     float speed;
@@ -38,20 +35,12 @@ struct Attack {
     Rectangle hitbox;
     Vector2 speed;
     int active;
+    int hp;
     Color color;
 };
 
-struct Actor player = { 0 };
-struct Actor enemy = { 0 };
-struct Attack fireworks[MAX_FIREWORKS] = { 0 };
-struct Attack shoot[MAX_SHOOTS] = { 0 };
-struct Item feather = { 0 };
-Sound fxfeather = { 0 };
-bool pause;
-bool DebugMode;
-int ammo = 5;
-int fireworkAmount = 0;
-int GI_callcount = 0;
-int trigMov;
+void DamageActor(struct Actor *actor);
+void UpdateiFrameTimer(struct Actor *actor);
+bool CheckAttackActivity(struct Attack attack[], int val, int max);
 
 #endif

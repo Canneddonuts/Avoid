@@ -12,26 +12,31 @@
 #include "Screens.h"
 #include "Controls.h"
 #include "Options.h"
-#include "Gameplay.h"
+#include "Gstructs.h"
 #include "Stats.h"
 #include "Timers.h"
 #include "Music.h"
 #include "Gfx.h"
 
+#define MAX_FIREWORKS 10
+#define MAX_SHOOTS 5
+
+struct Actor player = { 0 };
+struct Actor enemy = { 0 };
+struct Attack fireworks[MAX_FIREWORKS] = { 0 };
+struct Attack shoot[MAX_SHOOTS] = { 0 };
+struct Item feather = { 0 };
+Sound fxfeather = { 0 };
+bool pause;
+bool DebugMode;
+int ammo = 0;
+int fireworkAmount = 0;
+int GI_callcount = 0;
+int trigMov;
+
 int score = 0, bestscore = 0, finishfromGameplayScreen = 0, redfeathers = 0, greenfeathers = 0;
 
 Music Gameplaysong = { 0 };
-
-bool CheckAttackActivity(struct Attack attack[], int val, int max)
-{
-  int matches = 0;
-  for (int i = 0; i < max; i++) {
-    if (attack[i].active == val) matches++;
-  }
-
-  if (matches == max) return true;
-  else return false;
-}
 
 void LoadGamplayScreen(void)
 {
@@ -57,7 +62,7 @@ void InitGameplayScreen(void)
   globalTimer = 0;
 
   if (player.hp < 1) player.hp = 1;
-  if (ammo < 5) ammo = 5;
+  //if (ammo < 60) ammo = 60;
 
   player.currentframe = 0;
   player.speed = 300.0f;
@@ -80,7 +85,7 @@ void InitGameplayScreen(void)
   player.color = RAYWHITE;
 
   enemy.currentframe = 0;
-  enemy.hp = 5;
+  enemy.hp = 20;
   enemy.speed = 200.0f;
   if (GI_callcount < 1) {
     enemy.frameRec = (Rectangle) {
@@ -111,6 +116,7 @@ void InitGameplayScreen(void)
 
   for (int i = 0; i < MAX_FIREWORKS; i++) {
     fireworks[i].active = 1;
+    fireworks[i].hp = 5;
     fireworks[i].hitbox = (Rectangle) {
       GetScreenWidth() + firework_sprite.width,
       0,
@@ -118,12 +124,11 @@ void InitGameplayScreen(void)
       (float) firework_sprite.height
     };
     fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
-  /*  switch (level) {
+    switch (level) {
       case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
-      case LEVEL2: fireworks[i].speed.x = GetRandomValue(400, 600); break;
-      case LEVEL3: fireworks[i].speed.x = GetRandomValue(800, 1000); break;
-    } */
-    fireworks[i].speed.x = GetRandomValue(100, 300);
+      case LEVEL2: fireworks[i].speed.x = GetRandomValue(600, 800); break;
+      case LEVEL3: fireworks[i].speed.x = GetRandomValue(1200, 2400); break;
+    } 
     fireworks[i].color = RAYWHITE;
   }
 
@@ -134,15 +139,15 @@ void InitGameplayScreen(void)
       (float) attack_sprite.width,
       (float) attack_sprite.height
     };
-    shoot[i].speed.x = 500.f;
+    shoot[i].speed.x = 5000.f;
     shoot[i].speed.y = 0;
     shoot[i].active = false;
     shoot[i].color = RED;
   }
   switch (level) {
-    case LEVEL1: fireworkAmount = 50; break;
-    case LEVEL2: fireworkAmount = 200; break;
-    case LEVEL3: fireworkAmount = 500; break;
+    case LEVEL1: fireworkAmount = 100; break;
+    case LEVEL2: fireworkAmount = 150; break;
+    case LEVEL3: fireworkAmount = 200; break;
   }
 
   pause = 0;
@@ -153,41 +158,10 @@ void InitGameplayScreen(void)
   GI_callcount++;
 }
 
-void DamageActor(struct Actor *actor)
-{
-  if (!actor->in) {
-    actor->hp--;
-    if (!mute) PlaySoundMulti(actor->fxhit);
-    actor->in = true;
-  }
-
-  actor->currentframe = 1;
-}
-
-void UpdateiFrameTimer(struct Actor *actor)
-{
-  // here we use pointers to avoid duplicating code
-  if (actor->in) {
-    actor->iframetimer += GetFrameTime();
-    actor->currentframe = 1;
-    if ((int)globalTimer % 2 == 0) actor->color = GRAY;
-    else actor->color = RAYWHITE;
-    if (actor->iframetimer > 2) {
-      actor->in = false;
-      actor->iframetimer = 0;
-    }
-  } else { actor->color = RAYWHITE; actor->currentframe = 0; }
-}
-
 void ResetFeather(void)
 {
-  if (player.hp < 2) {
-    feather.power = 0;
-  } else if (ammo < 2) {
-    feather.power = 1;
-  } else {
-    feather.power = GetRandomValue(0, 1);
-  }
+  feather.power = 0;
+
   feather.hitbox.x = GetScreenWidth() + feather_sprite.width;
   feather.hitbox.y = GetRandomValue(0, GetScreenHeight() - feather_sprite.height);
   feather.active = false;
@@ -213,18 +187,18 @@ void UpdateGameplayScreen(void)
          player.speed = 600.0f;
          if (player.currentframe != 1) player.currentframe = 2;
        } else player.speed = 300.0f;
-       if (INPUT_FIRE_PRESSED) {
-         if (ammo > 0) {
+       if (INPUT_FIRE_DOWN) {
+        // if (ammo > 0) {
            for (int i = 0; i < MAX_SHOOTS; i++) {
              if (!shoot[i].active) {
-               ammo--;
+               ammo++;
                shoot[i].hitbox.x = player.hitbox.x;
                shoot[i].hitbox.y = player.hitbox.y + player.hitbox.height/4;
                shoot[i].active = true;
                break;
              }
            }
-         }
+       //  }
        }
          // Update sprite positions
          player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
@@ -281,7 +255,7 @@ void UpdateGameplayScreen(void)
 
           // Feather spawn logic
           if (level == LEVEL3) { if ((int) globalTimer % 10 == 0) feather.active = true; }
-          else { if ((int) globalTimer % 50 == 0) feather.active = true; }
+          else { if ((int) globalTimer % 30 == 0) feather.active = true; }
           switch (feather.power) {
              case 0:  feather.color = GREEN; break;
              case 1:  feather.color = RED; break;
@@ -292,7 +266,7 @@ void UpdateGameplayScreen(void)
              if (CheckCollisionRecs(player.hitbox,  feather.hitbox)) {
                  switch (feather.power) {
                    case 0: player.hp++;  break;
-                   case 1: ammo += 5; break;
+                   case 1: ammo += 60; break;
                  }
                  if (!mute) PlaySoundMulti(fxfeather);
                  ResetFeather();
@@ -329,16 +303,19 @@ void UpdateGameplayScreen(void)
              for (int j = 0; j < MAX_SHOOTS; j++) {
                if (CheckCollisionRecs(shoot[j].hitbox, fireworks[i].hitbox) && shoot[j].active) {
                  if (!mute) PlaySoundMulti(enemy.fxhit);
-                 fireworks[i].active = 0;
+                 fireworks[i].color = BLACK;
+                 shoot[j].active = 0;
+                 fireworks[i].hp--;
                  scoreTimer += 300;
-                 fireworkAmount--;
-               }
+               } else fireworks[i].color = RAYWHITE;
              }
              switch (fireworks[i].active) {
                 case 0:
                     fireworks[i].hitbox.x = GetScreenWidth() + firework_sprite.width;
 
-                    if (fireworkAmount > 0) { fireworkAmount--; fireworks[i].active = 1; }
+                    fireworks[i].hp = 5;
+
+                    if (fireworkAmount > 0) { /*fireworkAmount--;*/ fireworks[i].active = 1; }
                     fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
                    /* switch (level) {
                       case LEVEL1: fireworks[i].speed.x = GetFrameTime() break;
@@ -347,7 +324,8 @@ void UpdateGameplayScreen(void)
                     } */
                     break;
                 case 1:
-                  trigMov = sin(2*PI/100*fireworks[i].hitbox.x) * 200;
+                  if (fireworks[i].hp < 1) { fireworkAmount--; fireworks[i].active = 0; }
+                  trigMov = sin(2*PI/20*fireworks[i].hitbox.x) * 200;
                   fireworks[i].hitbox.x -= fireworks[i].speed.x * GetFrameTime();
                   fireworks[i].hitbox.y += trigMov*GetFrameTime();
                   // Firework wall collision
