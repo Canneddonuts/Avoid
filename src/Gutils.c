@@ -1,8 +1,20 @@
+/*
+-    Avoid ~ a game by Canneddonuts
+-      Filename ~ Gutils.c
+-       Author ~ Return0ne
+-            2022
+-         *no license*
+*/
+
 #include "../include/raylib.h"
 
 #include "Gstructs.h"
 #include "Timers.h"
 #include "Options.h"
+
+float pauseTimer;
+float globalTimer;
+float scoreTimer;
 
 void DamageActor(struct Actor *actor)
 {
