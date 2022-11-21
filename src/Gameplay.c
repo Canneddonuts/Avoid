@@ -127,9 +127,9 @@ void InitGameplayScreen(void)
     };
     fireworks[i].hitbox.y = GetRandomValue(0, GetScreenHeight() - firework_sprite.height);
     switch (level) {
-      case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 300); break;
-      case LEVEL2: fireworks[i].speed.x = GetRandomValue(600, 800); break;
-      case LEVEL3: fireworks[i].speed.x = GetRandomValue(800, 1000); break;
+      case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 200); break;
+      case LEVEL2: fireworks[i].speed.x = GetRandomValue(200, 300); break;
+      case LEVEL3: fireworks[i].speed.x = GetRandomValue(300, 400); break;
     }
     fireworks[i].color = RAYWHITE;
   }

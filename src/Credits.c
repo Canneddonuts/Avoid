@@ -27,13 +27,14 @@ void UpdateCreditsScreen(void)
 void DrawCreditsScreen(void)
 {
   DrawTexture(background, 0, 0, DARKGRAY);
-  DrawTextEx(ZadoBold, "CREDITS", (Vector2){ 290, 20 }, 50, 2, BLUE);
-  DrawTextEx(ZadoBold, "Programming and Art by Return0ne", (Vector2){ 10, 160 }, 40, 2, BLUE);
-  DrawTextEx(ZadoBold, "Powered by raylib 4.0", (Vector2){ 10, 200 }, 40, 2, BLUE);
-  DrawTextEx(ZadoBold, "rFXgen used for sfx", (Vector2){ 10, 235 }, 40, 2, BLUE);
-  DrawTextEx(ZadoBold, "A Canneddonuts project 2022", (Vector2){ 10, 270 }, 40, 2, BLUE);
-  DrawTextEx(ZadoBold, TextFormat("Build compiled on %s", __DATE__), (Vector2){ 10, 310 }, 30, 2, GREEN);
-  DrawTextEx(ZadoBold, "Press 'ENTER' ", (Vector2){ 10, 350 }, 30, 2, WHITE);
+  DrawText("CREDITS", 290, 20, 50, BLUE);
+  DrawText("Art by Mark and Allan", 10, 120, 40, BLUE);
+  DrawText("Programming by Mark", 10, 160, 40, BLUE);
+  DrawText("Powered by raylib 4.0", 10, 200, 40, BLUE);
+  DrawText("rFXgen used for sfx", 10, 235, 40, BLUE);
+  DrawText("A Canneddonuts project 2022", 10, 270, 40, BLUE);
+  DrawText(TextFormat("Build compiled on %s", __DATE__),  10, 310, 30, GREEN);
+  DrawText("Press 'ENTER' ", 10, 350, 30, WHITE);
 }
 
 int FinishCreditsScreen(void)
