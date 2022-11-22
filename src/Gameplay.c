@@ -129,7 +129,7 @@ void InitGameplayScreen(void)
     switch (level) {
       case LEVEL1: fireworks[i].speed.x = GetRandomValue(100, 200); break;
       case LEVEL2: fireworks[i].speed.x = GetRandomValue(200, 300); break;
-      case LEVEL3: fireworks[i].speed.x = GetRandomValue(300, 400); break;
+      case LEVEL3: fireworks[i].speed.x = GetRandomValue(250, 350); break;
     }
     fireworks[i].color = RAYWHITE;
   }
@@ -149,7 +149,7 @@ void InitGameplayScreen(void)
   switch (level) {
     case LEVEL1: fireworkAmount = 100; break;
     case LEVEL2: fireworkAmount = 150; break;
-    case LEVEL3: fireworkAmount = 200; break;
+    case LEVEL3: fireworkAmount = 100; break;
   }
 
   pause = 0;
@@ -245,8 +245,7 @@ void UpdateGameplayScreen(void)
          if (IsKeyPressed(KEY_NINE)) ammo = 99;
          if (IsKeyPressed(KEY_ZERO)) ammo = 0;
          if (IsKeyPressed(KEY_G)) finishfromGameplayScreen = 1;
-         if (IsKeyPressed(KEY_R)) finishfromGameplayScreen = 2;
-         if (IsKeyPressed(KEY_W)) finishfromGameplayScreen = 3;
+         if (IsKeyPressed(KEY_Q)) finishfromGameplayScreen = 4;
          if (IsKeyPressed(KEY_EQUAL)) level++;
          if (IsKeyPressed(KEY_MINUS)) level--;
 
@@ -311,7 +310,6 @@ void UpdateGameplayScreen(void)
              for (int j = 0; j < MAX_SHOOTS; j++) {
                if (CheckCollisionRecs(shoot[j].hitbox, fireworks[i].hitbox) && shoot[j].active) {
               //   if (!mute) PlaySoundMulti(enemy.fxhit);
-                 if (!mute) PlaySoundMulti(fxboom);
                  fireworks[i].color = BLACK;
                  shoot[j].active = 0;
                  fireworks[i].hp--;
@@ -333,13 +331,13 @@ void UpdateGameplayScreen(void)
                     } */
                     break;
                 case 1:
-                  if (fireworks[i].hp < 1) { fireworkAmount--; fireworks[i].active = 0; }
+                  if (fireworks[i].hp < 1) { fireworkAmount--; fireworks[i].active = 0; if (!mute) PlaySoundMulti(fxboom); }
               //    trigMov = sin(2*PI/20*fireworks[i].hitbox.x) * 200;
                   fireworks[i].hitbox.x -= fireworks[i].speed.x * GetFrameTime();
                 //  fireworks[i].hitbox.y += trigMov*GetFrameTime();
                   // Firework wall collision
                   if (((fireworks[i].hitbox.x + -firework_sprite.width) > GetScreenWidth()
-                  || (fireworks[i].hitbox.x <= -firework_sprite.width)))  fireworks[i].active = 0;
+                  || (fireworks[i].hitbox.x <= -firework_sprite.width))) { fireworks[i].active = 0; player.hp--; fireworkAmount--; }
                   break;
               }
          }

@@ -49,7 +49,9 @@ void DrawTitleScreen(void)
     DrawText("Press 'Left-ALT' + 'F' for full screen", 5, 100, 10, WHITE);
     DrawText("Press 'R' to restart", 5, 120, 10, WHITE);
     DrawText("Press 'ENTER' or 'START' to select an option", 5, 140, 10, WHITE);
-    DrawText("Press 'X' or 'A' on a gamepad to shoot", 5, 160, 10, WHITE);
+    DrawText("Press 'Z' or 'A' on a gamepad to shoot", 5, 160, 10, WHITE);
+    DrawText("Press 'Q' to return to level select", 5, 180, 10, WHITE);
+    DrawText("Remember to shoot down the fireworks.", 5, 200, 10, RED);
 //  DrawText("Ver: 0.1", 680, 420, 30, WHITE);
     if (titleSelected == 0) DrawTextEx(ZadoBold,"PLAY", (Vector2){ 360, 220 }, 30, 2, WHITE);
     else DrawTextEx(ZadoBold,"PLAY", (Vector2){ 360, 220 }, 30, 2, BLUE);
