@@ -97,8 +97,8 @@ static void update_transition(void)
   if (!transFadeOut) {
     transAlpha += GetFrameTime();
 
-    if (transAlpha > 0.76f) {
-      transAlpha = 0.75f;
+    if (transAlpha > 1) {
+      transAlpha = 1;
 
       switch (transFromScreen) {
         case TITLE: UnloadTitleScreen(); break;
@@ -129,7 +129,7 @@ static void update_transition(void)
   } else {
     transAlpha -= GetFrameTime();
 
-    if (transAlpha < -0.75f) {
+    if (transAlpha < 0) {
       transAlpha = 0.0f;
       transFadeOut = false;
       onTransition = false;
