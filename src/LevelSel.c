@@ -38,11 +38,9 @@ void DrawLevelSelScreen(void)
 {
   DrawTexture(background, 0, 0, GRAY);
 
-  DrawTexture(feather_sprite, 0, 0, GREEN);
-  DrawText(TextFormat("= %i", greenfeathers), 30, 30, 30, GREEN);
-  DrawTexture(feather_sprite, 80, 0, RED);
-  DrawText(TextFormat("= %i", redfeathers), 110, 30, 30, RED);
-  if (score >= 10000) DrawText(TextFormat("SCORE: %i", score), 10, 65, 30, (Color){ 222, 181, 0, 255 });
+  DrawTexture(feather_sprite, 0, 0, RED);
+  DrawText(TextFormat("= %i", greenfeathers), 30, 30, 30, RED);
+  if (score > 500000) DrawText(TextFormat("SCORE: %i", score), 10, 65, 30, (Color){ 222, 181, 0, 255 });
   else DrawText(TextFormat("SCORE: %i", score), 10, 65, 30, BLUE);
 
   if (levelSelected == 0) DrawText("1", 100, 220, 60, WHITE);

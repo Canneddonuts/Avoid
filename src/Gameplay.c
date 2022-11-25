@@ -30,12 +30,11 @@ Sound fxfeather = { 0 };
 Sound fxboom = { 0 };
 bool pause;
 bool DebugMode;
-int ammo = 0;
 int fireworkAmount = 0;
 int GI_callcount = 0;
 //int trigMov;
 
-int score = 0, bestscore = 0, finishfromGameplayScreen = 0, redfeathers = 0, greenfeathers = 0;
+int score = 0, bestscore = 0, finishfromGameplayScreen = 0, greenfeathers = 0;
 
 Music Gameplaysong = { 0 };
 
@@ -50,12 +49,12 @@ void LoadGamplayScreen(void)
   feather_sprite = LoadTexture("assets/gfx/feather.png");
   attack_sprite = LoadTexture("assets/gfx/attack.png");
   firework_sprite = LoadTexture("assets/gfx/firework.png");
-  Gameplaysong = LoadMusicStream("assets/bgm/03-Boss.ogg");
+//  Gameplaysong = LoadMusicStream("assets/bgm/03-Boss.ogg");
 }
 
 void InitGameplayScreen(void)
 {
-  PlayMusicStream(Gameplaysong);
+//  PlayMusicStream(Gameplaysong);
 
   finishfromGameplayScreen = 0;
 
@@ -64,7 +63,6 @@ void InitGameplayScreen(void)
   globalTimer = 0;
 
   if (player.hp < 1) player.hp = 1;
-  //if (ammo < 60) ammo = 60;
 
   player.currentframe = 0;
   player.speed = 300.0f;
@@ -144,7 +142,7 @@ void InitGameplayScreen(void)
     shoot[i].speed.x = 5000.f;
     shoot[i].speed.y = 0;
     shoot[i].active = false;
-    shoot[i].color = RED;
+    shoot[i].color = GREEN;
   }
   switch (level) {
     case LEVEL1: fireworkAmount = 100; break;
@@ -182,7 +180,7 @@ void UpdateGameplayScreen(void)
      finishfromGameplayScreen = 3;
    }
 
-   if (!mute) UpdateMusicStream(Gameplaysong);
+//   if (!mute) UpdateMusicStream(Gameplaysong);
 
    if (!pause) {
 
@@ -196,17 +194,14 @@ void UpdateGameplayScreen(void)
          if (player.currentframe != 1) player.currentframe = 2;
        } else player.speed = 300.0f;
        if (INPUT_FIRE_DOWN) {
-        // if (ammo > 0) {
            for (int i = 0; i < MAX_SHOOTS; i++) {
              if (!shoot[i].active) {
-               ammo++;
                shoot[i].hitbox.x = player.hitbox.x;
                shoot[i].hitbox.y = player.hitbox.y + player.hitbox.height/4;
                shoot[i].active = true;
                break;
              }
            }
-       //  }
        }
          // Update sprite positions
          player.sprite_pos = (Vector2){ player.hitbox.x, player.hitbox.y };
@@ -238,12 +233,9 @@ void UpdateGameplayScreen(void)
          UpdateiFrameTimer(&player);
         // UpdateiFrameTimer(&enemy);
          greenfeathers = player.hp;
-         redfeathers = ammo;
 
          // Debug stuff
          if (IsKeyPressed(KEY_D)) DebugMode = !DebugMode;
-         if (IsKeyPressed(KEY_NINE)) ammo = 99;
-         if (IsKeyPressed(KEY_ZERO)) ammo = 0;
          if (IsKeyPressed(KEY_G)) finishfromGameplayScreen = 1;
          if (IsKeyPressed(KEY_Q)) finishfromGameplayScreen = 4;
          if (IsKeyPressed(KEY_EQUAL)) level++;
@@ -264,8 +256,7 @@ void UpdateGameplayScreen(void)
           if (level == LEVEL3) { if ((int) globalTimer % 10 == 0) feather.active = true; }
           else { if ((int) globalTimer % 30 == 0) feather.active = true; }
           switch (feather.power) {
-             case 0:  feather.color = GREEN; break;
-             case 1:  feather.color = RED; break;
+             case 0:  feather.color = RED; break;
            }
            if (feather.active) {
              if (((feather.hitbox.x + -feather_sprite.width) > GetScreenWidth()
@@ -273,7 +264,6 @@ void UpdateGameplayScreen(void)
              if (CheckCollisionRecs(player.hitbox,  feather.hitbox)) {
                  switch (feather.power) {
                    case 0: player.hp++;  break;
-                   case 1: ammo += 60; break;
                  }
                  if (!mute) PlaySoundMulti(fxfeather);
                  ResetFeather();
@@ -381,13 +371,11 @@ void DrawGameplayScreen(void)
   }
 //  if (level == 2) DrawTextureRec(enemy_sprite, enemy.frameRec, enemy.sprite_pos, enemy.color);
   DrawTextureRec(player_sprite, player.frameRec, player.sprite_pos, player.color);
-  DrawTexture(feather_sprite, 0, 0, GREEN);
-  DrawText(TextFormat("= %i", player.hp), 30, 30, 30, GREEN);
-  DrawTexture(feather_sprite, 80, 0, RED);
-  DrawText(TextFormat("= %i", ammo), 110, 30, 30, RED);
+  DrawTexture(feather_sprite, 0, 0, RED);
+  DrawText(TextFormat("= %i", player.hp), 30, 30, 30, RED);
 //  if (level == 2)  DrawText(TextFormat("ENEMY HP: %i", enemy.hp), GetScreenWidth() - 380, 0, 20, RED);
-  DrawText(TextFormat("FIREWORKS LEFT: %i", fireworkAmount), GetScreenWidth() - 240, 0, 20, GREEN);
-  if (score >= 10000) DrawText(TextFormat("SCORE: %i", score), 10, 65, 30, (Color){ 222, 181, 0, 255 });
+//  DrawText(TextFormat("FIREWORKS LEFT: %i", fireworkAmount), GetScreenWidth() - 240, 0, 20, GREEN);
+  if (score > 500000) DrawText(TextFormat("SCORE: %i", score), 10, 65, 30, (Color){ 222, 181, 0, 255 });
   else DrawText(TextFormat("SCORE: %i", score), 10, 65, 30, BLUE);
   if (pause && (((int)pauseTimer/30)%2)) DrawTextEx(ZadoBold, "PAUSED", (Vector2){ 280, 160 }, 60, 2, WHITE);
 }

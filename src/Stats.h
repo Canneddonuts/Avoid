@@ -11,6 +11,5 @@
 
 extern int score;
 extern int greenfeathers;
-extern int redfeathers;
 
 #endif
