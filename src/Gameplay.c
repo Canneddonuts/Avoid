@@ -341,8 +341,8 @@ void DrawGameplayScreen(void)
     case LEVEL2: DrawTexture(background, 0, 0, ORANGE); break;
     case LEVEL3: DrawTexture(background, 0, 0, RED); break;
   }
-  DrawFPS(10, 430);
   if (DebugMode) {
+    DrawFPS(10, 430);
     DrawRectangleLines(player.hitbox.x, player.hitbox.y, player.hitbox.width, player.hitbox.height, BLUE);
     DrawRectangleLines(feather.hitbox.x, feather.hitbox.y, feather.hitbox.width, feather.hitbox.height, WHITE);
     //DrawRectangleLines(enemy.hitbox.x, enemy.hitbox.y, enemy.hitbox.width, enemy.hitbox.height, BLACK);
